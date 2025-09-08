@@ -4,62 +4,52 @@ namespace App\Http\Controllers;
 
 use App\Models\Address;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class AddressController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
-    {
-        //
+    public function index() {
+        $addresses = Auth::user()->addresses;
+        return view('addresses.index', compact('addresses'));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
+    public function create() {
+        return view('addresses.create');
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-    {
-        //
+    public function store(Request $request) {
+        $request->validate([
+            'phone'   => 'required',
+            'address' => 'required',
+        ]);
+
+        $data = $request->all();
+        $data['user_id'] = Auth::id();
+
+        Address::create($data);
+        return redirect()->route('addresses.index')->with('success', 'Them dia chi thanh cong');
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(Address $address)
-    {
-        //
+    public function edit($id) {
+        $address = Address::findOrFail($id);
+        return view('addresses.edit', compact('address'));
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Address $address)
-    {
-        //
+    public function update(Request $request, $id) {
+        $address = Address::findOrFail($id);
+
+        $request->validate([
+            'phone'   => 'required',
+            'address' => 'required',
+        ]);
+
+        $address->update($request->all());
+        return redirect()->route('addresses.index')->with('success', 'Cap nhat dia chi thanh cong');
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, Address $address)
-    {
-        //
+    public function destroy($id) {
+        Address::destroy($id);
+        return redirect()->route('addresses.index')->with('success', 'Xoa dia chi thanh cong');
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(Address $address)
-    {
-        //
-    }
 }

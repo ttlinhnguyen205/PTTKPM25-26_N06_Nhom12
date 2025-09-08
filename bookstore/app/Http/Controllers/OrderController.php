@@ -3,63 +3,59 @@
 namespace App\Http\Controllers;
 
 use App\Models\Order;
+use App\Models\Address;
+use App\Models\OrderDetail;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class OrderController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
-    {
-        //
+    public function index() {
+        $orders = Auth::user()->usertype === 'admin'
+            ? Order::with('details')->get()
+            : Order::where('customer_id', Auth::id())->with('details')->get();
+
+        return view('orders.index', compact('orders'));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
+    public function create() {
+        $addresses = Auth::user()->addresses;
+        return view('orders.create', compact('addresses'));
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-    {
-        //
+    public function store(Request $request) {
+        $request->validate([
+            'address_id' => 'required|exists:addresses,id',
+        ]);
+
+        $order = Order::create([
+            'customer_id' => Auth::id(),
+            'address_id'  => $request->address_id,
+            'totalMoney'  => 0,
+        ]);
+
+        return redirect()->route('orders.index')->with('success', 'Dat hang thanh cong');
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(Order $order)
-    {
-        //
+    public function show($id) {
+        $order = Order::with('details.product')->findOrFail($id);
+        return view('orders.show', compact('order'));
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Order $order)
-    {
-        //
+    public function update(Request $request, $id) {
+        $order = Order::findOrFail($id);
+
+        if (Auth::user()->usertype === 'admin') {
+            $order->update(['status' => $request->status]);
+        }
+
+        return redirect()->route('orders.index')->with('success', 'Cap nhat don hang thanh cong');
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, Order $order)
-    {
-        //
-    }
+    public function destroy($id) {
+        $order = Order::findOrFail($id);
+        $order->delete();
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(Order $order)
-    {
-        //
+        return redirect()->route('orders.index')->with('success', 'Xoa don hang thanh cong');
     }
 }
