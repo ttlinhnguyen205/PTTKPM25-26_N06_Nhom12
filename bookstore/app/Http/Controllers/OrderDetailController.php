@@ -3,63 +3,28 @@
 namespace App\Http\Controllers;
 
 use App\Models\OrderDetail;
+use App\Models\Product;
 use Illuminate\Http\Request;
 
 class OrderDetailController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
-    {
-        //
-    }
+    public function store(Request $request) {
+        $request->validate([
+            'order_id'   => 'required|exists:orders,id',
+            'product_id' => 'required|exists:products,id',
+            'quantity'   => 'required|integer|min:1',
+        ]);
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
+        $product = Product::findOrFail($request->product_id);
+        $price   = $product->price * $request->quantity;
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-    {
-        //
-    }
+        OrderDetail::create([
+            'order_id'   => $request->order_id,
+            'product_id' => $request->product_id,
+            'quantity'   => $request->quantity,
+            'price'      => $price,
+        ]);
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(OrderDetail $orderDetail)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(OrderDetail $orderDetail)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, OrderDetail $orderDetail)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(OrderDetail $orderDetail)
-    {
-        //
+        return back()->with('success', 'Them san pham vao don hang thanh cong');
     }
 }
