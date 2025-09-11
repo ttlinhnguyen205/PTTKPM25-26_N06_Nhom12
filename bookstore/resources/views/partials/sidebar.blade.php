@@ -14,8 +14,8 @@
             </a>
             <div class="collapse" id="ui-basic">
               <ul class="nav flex-column sub-menu">
-                <li class="nav-item"> <a class="nav-link" href="pages/ui-features/buttons.html">Order List</a></li>
-                <li class="nav-item"> <a class="nav-link" href="pages/ui-features/dropdowns.html">Create Order</a></li>
+                <li class="nav-item"> <a class="nav-link" href="{{ route('admin.orders.index') }}">Order List</a></li>
+                <li class="nav-item"> <a class="nav-link" href="{{ route('admin.orders.create') }}">Create Order</a></li>
               </ul>
             </div>
           </li>
@@ -27,8 +27,8 @@
             </a>
             <div class="collapse" id="form-elements">
               <ul class="nav flex-column sub-menu">
-                <li class="nav-item"><a class="nav-link" href="pages/forms/basic_elements.html">Products List</a></li>
-                <li class="nav-item"><a class="nav-link" href="pages/forms/basic_elements.html">Create Product</a></li>
+                <li class="nav-item"><a class="nav-link" href="{{ route('admin.products.index') }}">Products List</a></li>
+                <li class="nav-item"><a class="nav-link" href="{{ route('admin.products.create') }}">Create Product</a></li>
               </ul>
             </div>
           </li>
@@ -40,8 +40,8 @@
             </a>
             <div class="collapse" id="charts">
               <ul class="nav flex-column sub-menu">
-                <li class="nav-item"> <a class="nav-link" href="pages/charts/chartjs.html">List Categories</a></li>
-                <li class="nav-item"> <a class="nav-link" href="pages/charts/chartjs.html">Create Categories</a></li>
+                <li class="nav-item"> <a class="nav-link" href="{{ route('admin.categories.index') }}">List Categories</a></li>
+                <li class="nav-item"> <a class="nav-link" href="{{ route('admin.categories.create') }}">Create Categories</a></li>
               </ul>
             </div>
           </li>
@@ -53,8 +53,8 @@
             </a>
             <div class="collapse" id="auth">
               <ul class="nav flex-column sub-menu">
-                <li class="nav-item"> <a class="nav-link" href="pages/samples/login.html"> List Users</a></li>
-                <li class="nav-item"> <a class="nav-link" href="pages/samples/register.html"> Create User</a></li>
+                <li class="nav-item"> <a class="nav-link" href="{{ route('admin.users.index') }}"> List Users</a></li>
+                <li class="nav-item"> <a class="nav-link" href="{{ route('admin.users.create') }}"> Create User</a></li>
               </ul>
             </div>
           </li>

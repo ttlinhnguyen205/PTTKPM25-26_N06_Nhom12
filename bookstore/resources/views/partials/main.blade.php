@@ -49,18 +49,26 @@
                 <div class="col-md-6 mb-4 stretch-card transparent">
                   <div class="card card-tale">
                     <div class="card-body">
-                      <p class="mb-4">Today’s Bookings</p>
-                      <p class="fs-30 mb-2">4006</p>
-                      <p>10.00% (30 days)</p>
+                      <p class="mb-4">Total Products</p>
+                      <p class="fs-30 mb-2">{{ $totalProducts }}</p>
                     </div>
                   </div>
                 </div>
+
                 <div class="col-md-6 mb-4 stretch-card transparent">
                   <div class="card card-dark-blue">
                     <div class="card-body">
-                      <p class="mb-4">Total Bookings</p>
-                      <p class="fs-30 mb-2">61344</p>
-                      <p>22.00% (30 days)</p>
+                      <p class="mb-4">Total Categories</p>
+                      <p class="fs-30 mb-2">{{ $totalCategories }}</p>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="col-md-6 mb-4 stretch-card transparent">
+                  <div class="card card-light-blue">
+                    <div class="card-body">
+                      <p class="mb-4">Total Orders</p>
+                      <p class="fs-30 mb-2">{{ $totalOrders }}</p>
                     </div>
                   </div>
                 </div>
@@ -320,53 +328,19 @@
                         <tr>
                           <th>Product</th>
                           <th>Price</th>
-                          <th>Date</th>
+                          <th>Quantity</th>
                           <th>Status</th>
-                        </tr>  
+                        </tr>
                       </thead>
                       <tbody>
+                        @foreach(App\Models\Product::latest()->take(5)->get() as $product)
                         <tr>
-                          <td>Search Engine Marketing</td>
-                          <td class="font-weight-bold">$362</td>
-                          <td>21 Sep 2018</td>
-                          <td class="font-weight-medium"><div class="badge badge-success">Completed</div></td>
+                          <td>{{ $product->name }}</td>
+                          <td>{{ number_format($product->price, 2) }} $</td>
+                          <td>{{ $product->quantity }}</td>
+                          <td><div class="badge badge-success">Available</div></td>
                         </tr>
-                        <tr>
-                          <td>Search Engine Optimization</td>
-                          <td class="font-weight-bold">$116</td>
-                          <td>13 Jun 2018</td>
-                          <td class="font-weight-medium"><div class="badge badge-success">Completed</div></td>
-                        </tr>
-                        <tr>
-                          <td>Display Advertising</td>
-                          <td class="font-weight-bold">$551</td>
-                          <td>28 Sep 2018</td>
-                          <td class="font-weight-medium"><div class="badge badge-warning">Pending</div></td>
-                        </tr>
-                        <tr>
-                          <td>Pay Per Click Advertising</td>
-                          <td class="font-weight-bold">$523</td>
-                          <td>30 Jun 2018</td>
-                          <td class="font-weight-medium"><div class="badge badge-warning">Pending</div></td>
-                        </tr>
-                        <tr>
-                          <td>E-Mail Marketing</td>
-                          <td class="font-weight-bold">$781</td>
-                          <td>01 Nov 2018</td>
-                          <td class="font-weight-medium"><div class="badge badge-danger">Cancelled</div></td>
-                        </tr>
-                        <tr>
-                          <td>Referral Marketing</td>
-                          <td class="font-weight-bold">$283</td>
-                          <td>20 Mar 2018</td>
-                          <td class="font-weight-medium"><div class="badge badge-warning">Pending</div></td>
-                        </tr>
-                        <tr>
-                          <td>Social media marketing</td>
-                          <td class="font-weight-bold">$897</td>
-                          <td>26 Oct 2018</td>
-                          <td class="font-weight-medium"><div class="badge badge-success">Completed</div></td>
-                        </tr>
+                        @endforeach
                       </tbody>
                     </table>
                   </div>

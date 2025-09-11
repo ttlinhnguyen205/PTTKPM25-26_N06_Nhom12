@@ -1,7 +1,8 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Admin;
 
+use App\Http\Controllers\Controller;
 use App\Models\Category;
 use Illuminate\Http\Request;
 
@@ -9,11 +10,11 @@ class CategoryController extends Controller
 {
     public function index() {
         $categories = Category::all();
-        return view('categories.index', compact('categories'));
+        return view('admin.categories.index', compact('categories'));
     }
 
     public function create() {
-        return view('categories.create');
+        return view('admin.categories.create');
     }
 
     public function store(Request $request) {
@@ -21,13 +22,13 @@ class CategoryController extends Controller
             'name' => 'required|string|max:255',
         ]);
 
-        Category::create($request->all());
-        return redirect()->route('categories.index')->with('success', 'Them danh muc thanh cong');
+        Category::create($request->only('name'));
+        return redirect()->route('admin.categories.index')->with('success', 'Thêm danh mục thành công');
     }
 
     public function edit($id) {
         $category = Category::findOrFail($id);
-        return view('categories.edit', compact('category'));
+        return view('admin.categories.edit', compact('category'));
     }
 
     public function update(Request $request, $id) {
@@ -36,12 +37,12 @@ class CategoryController extends Controller
         ]);
 
         $category = Category::findOrFail($id);
-        $category->update($request->all());
-        return redirect()->route('categories.index')->with('success', 'Cap nhat danh muc thanh cong');
+        $category->update($request->only('name'));
+        return redirect()->route('admin.categories.index')->with('success', 'Cập nhật danh mục thành công');
     }
 
     public function destroy($id) {
         Category::destroy($id);
-        return redirect()->route('categories.index')->with('success', 'Xoa danh muc thanh cong');
+        return redirect()->route('admin.categories.index')->with('success', 'Xóa danh mục thành công');
     }
 }
