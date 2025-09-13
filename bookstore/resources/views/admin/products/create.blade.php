@@ -6,7 +6,6 @@
 <div class="container">
     <h2 class="mb-4">Thêm sản phẩm</h2>
 
-    {{-- Hiển thị lỗi validate --}}
     @if ($errors->any())
         <div class="alert alert-danger">
             <ul class="mb-0">

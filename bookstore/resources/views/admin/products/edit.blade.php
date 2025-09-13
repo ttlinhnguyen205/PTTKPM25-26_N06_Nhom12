@@ -1,4 +1,4 @@
-@extends('layouts.app')
+@extends('layouts.admin')
 
 @section('content')
 <div class="container">
@@ -15,7 +15,6 @@
         </div>
     @endif
 
-    {{-- Form cập nhật sản phẩm --}}
     <form action="{{ route('admin.products.update', $product->id) }}" method="POST" enctype="multipart/form-data">
         @csrf
         @method('PUT')
@@ -83,7 +82,7 @@
             <label class="form-label">Ảnh sản phẩm</label>
             <input type="file" name="image" class="form-control">
             @if($product->image)
-                <img src="{{ asset('storage/'.$product->image) }}" 
+                <img src="{{ asset('images/book/' . $product->image) }}" 
                      alt="{{ $product->name }}" width="120" class="mt-2">
             @endif
         </div>

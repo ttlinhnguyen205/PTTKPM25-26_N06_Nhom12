@@ -9,7 +9,7 @@
 
     <div class="card">
         <div class="card-body">
-            <p class="card-title">Advanced Table</p>
+            <p class="card-title">Danh sách sản phẩm</p>
             <div class="row">
                 <div class="col-12">
                     <div class="table-responsive">
@@ -25,7 +25,7 @@
                             <table id="example" class="display expandable-table dataTable no-footer" style="width:100%" role="grid">
                                 <thead>
                                     <tr role="row">
-                                        <th>#</th>
+                                        <th>ID</th>
                                         <th>Tên sách</th>
                                         <th>Tác giả</th>
                                         <th>NXB</th>
