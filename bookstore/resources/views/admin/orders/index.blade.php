@@ -17,7 +17,7 @@
     <table class="table table-bordered">
         <thead>
             <tr>
-                <th>#</th>
+                <th>ID</th>
                 <th>Khách hàng</th>
                 <th>Địa chỉ</th>
                 <th>Ngày tạo</th>

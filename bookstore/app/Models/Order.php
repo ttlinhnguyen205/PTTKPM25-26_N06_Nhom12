@@ -7,11 +7,11 @@ use Illuminate\Database\Eloquent\Model;
 class Order extends Model
 {
     protected $fillable = [
-        'date',
-        'status',
-        'totalMoney',
-        'customer_id',
-        'address_id',
+        'date', 'status', 'total_money', 'customer_id', 'address_id'
+    ];
+
+    protected $casts = [
+        'date' => 'datetime',
     ];
 
     public function customer()
@@ -21,7 +21,7 @@ class Order extends Model
 
     public function address()
     {
-        return $this->belongsTo(Address::class);
+        return $this->belongsTo(Address::class, 'address_id');
     }
 
     public function orderDetails()

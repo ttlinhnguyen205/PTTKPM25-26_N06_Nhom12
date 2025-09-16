@@ -27,8 +27,8 @@ Route::middleware(['auth', 'userMiddleware'])->group(function(){
 });
 // Admin route
 Route::middleware(['auth', 'adminMiddleware'])
-    ->prefix('admin')   // URL sẽ bắt đầu bằng /admin
-    ->name('admin.')    // Tất cả route sẽ có tiền tố tên là admin.
+    ->prefix('admin')   
+    ->name('admin.')   
     ->group(function () {
         Route::get('/dashboard', [AdminController::class, 'index'])->name('dashboard');
 

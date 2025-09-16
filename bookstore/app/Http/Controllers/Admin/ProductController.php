@@ -7,6 +7,7 @@ use App\Models\Product;
 use App\Models\Category;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\Str;
 
 class ProductController extends Controller
 {
@@ -50,7 +51,7 @@ class ProductController extends Controller
             case 'qty_asc':    $query->orderBy('quantity', 'asc'); break;
             case 'qty_desc':   $query->orderBy('quantity', 'desc'); break;
             case 'oldest':     $query->orderBy('id', 'asc'); break;
-            default:           $query->latest(); break; 
+            default:           $query->latest(); break;
         }
 
         $perPage = (int) $request->input('per_page', 10);
@@ -58,16 +59,10 @@ class ProductController extends Controller
             $perPage = 10;
         }
 
-        $products   = $query->paginate($perPage)->withQueryString(); 
+        $products = $query->paginate($perPage)->withQueryString();
         $categories = Category::orderBy('name')->get();
 
         return view('admin.products.index', compact('products', 'categories', 'sort'));
-    }
-
-    public function show($id)
-    {
-        $product = Product::with('category')->findOrFail($id);
-        return view('admin.products.show', compact('product'));
     }
 
     public function create()
@@ -79,35 +74,33 @@ class ProductController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'id'          => 'nullable|integer|min:1|unique:products,id', 
             'name'        => 'required|string|max:255',
+            'slug'        => 'nullable|string|max:255|unique:products,slug',
             'price'       => 'required|numeric|min:0',
             'quantity'    => 'required|integer|min:0',
             'category_id' => 'required|exists:categories,id',
             'image'       => 'nullable|image|mimes:jpg,jpeg,png,webp|max:4096',
         ]);
 
-        $data = $request->except(['image','id']);
-        $product = new Product($data);
+        $data = $request->except(['image', 'id']);
 
-        if ($request->filled('id')) {
-            $product->id = (int) $request->id;
+        // Tạo slug tự động từ name nếu không có
+        if (!$request->has('slug') || empty($request->slug)) {
+            $data['slug'] = Str::slug($request->name);
         }
 
+        $product = new Product($data);
+
         if ($request->hasFile('image')) {
-            if (! File::exists(public_path('images/book'))) {
-                File::makeDirectory(public_path('images/book'), 0755, true);
-            }
-            $file     = $request->file('image');
-            $filename = time().'_'.$file->getClientOriginalName();
-            $file->move(public_path('images/book'), $filename);
-            $product->image = 'images/book/'.$filename;
+            $file = $request->file('image');
+            $filename = time() . '_' . $file->getClientOriginalName();
+            $file->move(public_path('images/products'), $filename);
+            $product->image = 'images/products/' . $filename;
         }
 
         $product->save();
 
-        return redirect()->route('admin.products.index')
-                         ->with('success', 'Thêm sản phẩm thành công');
+        return redirect()->route('admin.products.index')->with('success', 'Thêm sản phẩm thành công');
     }
 
     public function edit($id)
@@ -123,44 +116,53 @@ class ProductController extends Controller
 
         $request->validate([
             'name'        => 'required|string|max:255',
+            'slug'        => 'nullable|string|max:255|unique:products,slug,' . $product->id,
             'price'       => 'required|numeric|min:0',
             'quantity'    => 'required|integer|min:0',
             'category_id' => 'required|exists:categories,id',
             'image'       => 'nullable|image|mimes:jpg,jpeg,png,webp|max:4096',
         ]);
 
-        $data = $request->except(['image','id']);
+        $data = $request->except(['image', 'id']);
+
+        if (!$request->has('slug') || empty($request->slug)) {
+            $data['slug'] = Str::slug($request->name);
+        }
 
         if ($request->hasFile('image')) {
-            if (! File::exists(public_path('images/book'))) {
-                File::makeDirectory(public_path('images/book'), 0755, true);
-            }
-            if (!empty($product->image) && File::exists(public_path($product->image))) {
+            if (File::exists(public_path($product->image))) {
                 File::delete(public_path($product->image));
             }
-            $file     = $request->file('image');
-            $filename = time().'_'.$file->getClientOriginalName();
-            $file->move(public_path('images/book'), $filename);
-            $data['image'] = 'images/book/'.$filename;
+            $file = $request->file('image');
+            $filename = time() . '_' . $file->getClientOriginalName();
+            $file->move(public_path('images/products'), $filename);
+            $data['image'] = 'images/products/' . $filename;
         }
 
         $product->update($data);
 
-        return redirect()->route('admin.products.index')
-                         ->with('success', 'Cập nhật sản phẩm thành công');
+        return redirect()->route('admin.products.index')->with('success', 'Cập nhật sản phẩm thành công');
     }
 
     public function destroy($id)
     {
         $product = Product::findOrFail($id);
 
-        if (!empty($product->image) && File::exists(public_path($product->image))) {
+        if (File::exists(public_path($product->image))) {
             File::delete(public_path($product->image));
         }
 
         $product->delete();
 
-        return redirect()->route('admin.products.index')
-                         ->with('success', 'Xóa sản phẩm thành công');
+        return redirect()->route('admin.products.index')->with('success', 'Xóa sản phẩm thành công');
+    }
+
+    public function show($id)
+    {
+        // Lấy thông tin sản phẩm dựa trên ID
+        $product = Product::with('category')->findOrFail($id);
+
+        // Trả về view hiển thị chi tiết sản phẩm
+        return view('admin.products.show', compact('product'));
     }
 }

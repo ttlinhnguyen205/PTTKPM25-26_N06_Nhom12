@@ -47,7 +47,8 @@
             <th>Ảnh</th>
             <td>
                 @if($product->image)
-                    <img src="{{ asset('storage/'.$product->image) }}" width="150">
+
+                    <img src="{{ asset('images/book/'.$product->image) }}" width="150">
                 @else
                     Không có ảnh
                 @endif

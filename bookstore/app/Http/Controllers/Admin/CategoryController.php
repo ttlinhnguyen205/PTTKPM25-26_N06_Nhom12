@@ -5,44 +5,83 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Category;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 
 class CategoryController extends Controller
 {
-    public function index() {
+    public function index()
+    {
         $categories = Category::all();
         return view('admin.categories.index', compact('categories'));
     }
 
-    public function create() {
+    public function create()
+    {
         return view('admin.categories.create');
     }
 
-    public function store(Request $request) {
+    public function store(Request $request)
+    {
+        // Validate dữ liệu
         $request->validate([
             'name' => 'required|string|max:255',
         ]);
 
-        Category::create($request->only('name'));
+        // Tạo slug từ tên (name)
+        $slug = Str::slug($request->name);
+
+        // Kiểm tra xem slug có bị trùng không
+        if (Category::where('slug', $slug)->exists()) {
+            $slug = $slug . '-' . Str::random(5); // Thêm mã ngẫu nhiên nếu slug trùng
+        }
+
+        // Lưu danh mục mới
+        Category::create([
+            'name' => $request->name,
+            'slug' => $slug
+        ]);
+
         return redirect()->route('admin.categories.index')->with('success', 'Thêm danh mục thành công');
     }
 
-    public function edit($id) {
+    public function edit($id)
+    {
         $category = Category::findOrFail($id);
         return view('admin.categories.edit', compact('category'));
     }
 
-    public function update(Request $request, $id) {
+    public function update(Request $request, $id)
+    {
+        // Validate dữ liệu
         $request->validate([
             'name' => 'required|string|max:255',
         ]);
 
+        // Lấy danh mục hiện tại
         $category = Category::findOrFail($id);
-        $category->update($request->only('name'));
+
+        // Tạo slug mới nếu tên thay đổi
+        $slug = Str::slug($request->name);
+
+        // Kiểm tra xem slug có bị trùng không
+        if (Category::where('slug', $slug)->where('id', '!=', $id)->exists()) {
+            $slug = $slug . '-' . Str::random(5); // Thêm mã ngẫu nhiên nếu slug trùng
+        }
+
+        // Cập nhật danh mục
+        $category->update([
+            'name' => $request->name,
+            'slug' => $slug
+        ]);
+
         return redirect()->route('admin.categories.index')->with('success', 'Cập nhật danh mục thành công');
     }
 
-    public function destroy($id) {
+    public function destroy($id)
+    {
+        // Xóa danh mục
         Category::destroy($id);
+
         return redirect()->route('admin.categories.index')->with('success', 'Xóa danh mục thành công');
     }
 }

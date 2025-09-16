@@ -20,7 +20,7 @@ class OrderController extends Controller
     // Xem chi tiết đơn hàng
     public function show($id)
     {
-        $order = Order::with(['customer', 'address', 'details.product'])->findOrFail($id);
+        $order = Order::with(['customer', 'address', 'orderDetails.product'])->findOrFail($id);
         return view('admin.orders.show', compact('order'));
     }
 
@@ -40,11 +40,12 @@ class OrderController extends Controller
             'address_id' => 'required|exists:addresses,id',
         ]);
 
+        // Lưu đơn hàng mới
         Order::create([
             'customer_id' => $request->customer_id,
             'address_id' => $request->address_id,
-            'status' => 'pending',
-            'totalMoney' => 0,
+            'status' => 'pending', // Trạng thái mặc định là 'pending'
+            'total_money' => 0, // Khởi tạo giá trị tổng tiền (sẽ cập nhật sau)
         ]);
 
         return redirect()->route('admin.orders.index')->with('success', 'Thêm đơn hàng thành công');
@@ -67,9 +68,26 @@ class OrderController extends Controller
             'status' => 'required|in:pending,confirmed,shipping,completed,cancelled'
         ]);
 
-        $order->update(['status' => $request->status]);
+        // Cập nhật trạng thái đơn hàng
+        $order->update([
+            'status' => $request->status,
+            'total_money' => $this->calculateTotalMoney($order->id), // Tính lại tổng tiền sau khi cập nhật trạng thái
+        ]);
 
         return redirect()->route('admin.orders.index')->with('success', 'Cập nhật trạng thái đơn hàng thành công');
+    }
+
+    // Tính tổng tiền của đơn hàng
+    private function calculateTotalMoney($orderId)
+    {
+        $orderDetails = Order::find($orderId)->orderDetails;
+        $total = 0;
+        
+        foreach ($orderDetails as $detail) {
+            $total += $detail->price * $detail->quantity;
+        }
+
+        return $total;
     }
 
     // Xóa đơn hàng
