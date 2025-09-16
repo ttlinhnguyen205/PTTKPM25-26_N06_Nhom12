@@ -6,66 +6,41 @@
               <span class="menu-title">Dashboard</span>
             </a>
           </li>
+
           <li class="nav-item">
-            <a class="nav-link" data-toggle="collapse" href="#charts" aria-expanded="false" aria-controls="charts">
-              <i class="icon-bar-graph menu-icon"></i>
-              <span class="menu-title">Categories</span>
-              <i class="menu-arrow"></i>
+            <a class="nav-link" href="{{ route('admin.categories.index') }}">
+              <i class="icon-paper menu-icon"></i>
+              <span class="menu-title">Quản lý danh mục</span>
             </a>
-            <div class="collapse" id="charts">
-              <ul class="nav flex-column sub-menu">
-                <li class="nav-item"> <a class="nav-link" href="{{ route('admin.categories.index') }}">List Categories</a></li>
-                <li class="nav-item"> <a class="nav-link" href="{{ route('admin.categories.create') }}">Create Categories</a></li>
-              </ul>
-            </div>
           </li>
+
           <li class="nav-item">
-            <a class="nav-link" data-toggle="collapse" href="#form-elements" aria-expanded="false" aria-controls="form-elements">
+            <a class="nav-link" href={{ route('admin.products.index') }}>
               <i class="icon-columns menu-icon"></i>
-              <span class="menu-title">Products</span>
-              <i class="menu-arrow"></i>
+              <span class="menu-title">Quản lý sản phẩm</span>
             </a>
-            <div class="collapse" id="form-elements">
-              <ul class="nav flex-column sub-menu">
-                <li class="nav-item"><a class="nav-link" href="{{ route('admin.products.index') }}">Products List</a></li>
-                <li class="nav-item"><a class="nav-link" href="{{ route('admin.products.create') }}">Create Product</a></li>
-              </ul>
-            </div>
           </li>
+
           <li class="nav-item">
-            <a class="nav-link" data-toggle="collapse" href="#ui-basic" aria-expanded="false" aria-controls="ui-basic">
+            <a class="nav-link" href="{{ route('admin.orders.index') }}">
               <i class="icon-layout menu-icon"></i>
-              <span class="menu-title">Orders</span>
-              <i class="menu-arrow"></i>
+              <span class="menu-title">Quản lý đơn hàng</span>
             </a>
-            
-            <div class="collapse" id="ui-basic">
-              <ul class="nav flex-column sub-menu">
-                <li class="nav-item"> <a class="nav-link" href="{{ route('admin.orders.index') }}">Order List</a></li>
-                <li class="nav-item"> <a class="nav-link" href="{{ route('admin.orders.create') }}">Create Order</a></li>
-              </ul>
-            </div>
           </li>
-          
-          
           <li class="nav-item">
-            <a class="nav-link" data-toggle="collapse" href="#auth" aria-expanded="false" aria-controls="auth">
+            <a class="nav-link" href="{{ route('admin.users.index') }}">
               <i class="icon-head menu-icon"></i>
-              <span class="menu-title">User </span>
-              <i class="menu-arrow"></i>
+              <span class="menu-title">Quản lý người dùng</span>
             </a>
-            <div class="collapse" id="auth">
-              <ul class="nav flex-column sub-menu">
-                <li class="nav-item"> <a class="nav-link" href="{{ route('admin.users.index') }}"> List Users</a></li>
-                <li class="nav-item"> <a class="nav-link" href="{{ route('admin.users.create') }}"> Create User</a></li>
-              </ul>
-            </div>
           </li>
+
           <li class="nav-item">
             <a class="nav-link" href="pages/documentation/documentation.html">
               <i class="icon-paper menu-icon"></i>
               <span class="menu-title">Documentation</span>
             </a>
           </li>
+
+
         </ul>
       </nav>
