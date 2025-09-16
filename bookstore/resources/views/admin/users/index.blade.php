@@ -4,7 +4,7 @@
 
 @section('content')
 <div class="container">
-    <h4 class="card-title">Danh sách người dùng</h4>
+    <h2 class="card-title">Danh sách người dùng</h2>
     <div class="card">
         <div class="card-body">
             <a href="{{ route('admin.users.create') }}" class="btn btn-primary mb-3">+ Tạo tài khoản</a>
