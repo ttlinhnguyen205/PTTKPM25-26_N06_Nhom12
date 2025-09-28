@@ -3,59 +3,71 @@
 @section('title', 'Chi tiết sản phẩm')
 
 @section('content')
-<div class="container">
-    <h2>Chi tiết sản phẩm</h2>
+<div class="container mt-4">
+    <h2 class="mb-4">Chi tiết sản phẩm</h2>
 
-    <table class="table table-bordered">
-        <tr>
-            <th>Tên</th>
-            <td>{{ $product->name }}</td>
-        </tr>
-        <tr>
-            <th>Giá</th>
-            <td>{{ number_format($product->price, 0) }} đ</td>
-        </tr>
-        <tr>
-            <th>Số lượng</th>
-            <td>{{ $product->quantity }}</td>
-        </tr>
-        <tr>
-            <th>Tác giả</th>
-            <td>{{ $product->author }}</td>
-        </tr>
-        <tr>
-            <th>Nhà xuất bản</th>
-            <td>{{ $product->publisher }}</td>
-        </tr>
-        <tr>
-            <th>Số trang</th>
-            <td>{{ $product->page }}</td>
-        </tr>
-        <tr>
-            <th>Mô tả</th>
-            <td>{{ $product->description }}</td>
-        </tr>
-        <tr>
-            <th>Năm xuất bản</th>
-            <td>{{ $product->year_of_publication }}</td>
-        </tr>
-        <tr>
-            <th>Danh mục</th>
-            <td>{{ $product->category->name ?? 'N/A' }}</td>
-        </tr>
-        <tr>
-            <th>Ảnh</th>
-            <td>
-                @if($product->image)
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <div class="row">
+                {{-- Ảnh sản phẩm --}}
+                <div class="col-md-4 text-center mb-3">
+                    @if($product->image && file_exists(public_path('images/' . $product->image)))
+                        <img src="{{ asset('images/' . $product->image) }}" 
+                            alt="{{ $product->name }}" class="img-fluid img-thumbnail">
+                    @else
+                        <span>Không có ảnh</span>
+                    @endif
+                </div>
 
-                    <img src="{{ asset('images/book/'.$product->image) }}" width="150">
-                @else
-                    Không có ảnh
-                @endif
-            </td>
-        </tr>
-    </table>
+                {{-- Thông tin sản phẩm --}}
+                <div class="col-md-8">
+                    <table class="table table-bordered table-striped">
+                        <tbody>
+                            <tr>
+                                <th>Tên</th>
+                                <td>{{ $product->name }}</td>
+                            </tr>
+                            <tr>
+                                <th>Giá</th>
+                                <td>{{ number_format($product->price, 0, ',', '.') }} đ</td>
+                            </tr>
+                            <tr>
+                                <th>Số lượng</th>
+                                <td>{{ $product->quantity }}</td>
+                            </tr>
+                            <tr>
+                                <th>Tác giả</th>
+                                <td>{{ $product->author ?? '-' }}</td>
+                            </tr>
+                            <tr>
+                                <th>Nhà xuất bản</th>
+                                <td>{{ $product->publisher ?? '-' }}</td>
+                            </tr>
+                            <tr>
+                                <th>Số trang</th>
+                                <td>{{ $product->page ?? '-' }}</td>
+                            </tr>
+                            <tr>
+                                <th>Mô tả</th>
+                                <td>{{ $product->description ?? '-' }}</td>
+                            </tr>
+                            <tr>
+                                <th>Năm xuất bản</th>
+                                <td>{{ $product->year_of_publication ?? '-' }}</td>
+                            </tr>
+                            <tr>
+                                <th>Danh mục</th>
+                                <td>{{ $product->category->name ?? 'N/A' }}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
 
-    <a href="{{ route('admin.products.index') }}" class="btn btn-secondary">Quay lại</a>
+            <div class="mt-3">
+                <a href="{{ route('admin.products.index') }}" class="btn btn-secondary">Quay lại</a>
+            </div>
+        </div>
+    </div>
 </div>
 @endsection

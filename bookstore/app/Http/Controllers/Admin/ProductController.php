@@ -18,11 +18,11 @@ class ProductController extends Controller
         if ($search = trim($request->input('q'))) {
             $query->where(function ($q) use ($search) {
                 $q->where('name', 'like', "%{$search}%")
-                ->orWhere('author', 'like', "%{$search}%")
-                ->orWhere('publisher', 'like', "%{$search}%")
-                ->orWhereHas('category', function ($cq) use ($search) {
-                    $cq->where('name', 'like', "%{$search}%");
-                });
+                  ->orWhere('author', 'like', "%{$search}%")
+                  ->orWhere('publisher', 'like', "%{$search}%")
+                  ->orWhereHas('category', function ($cq) use ($search) {
+                      $cq->where('name', 'like', "%{$search}%");
+                  });
             });
         }
 
@@ -55,7 +55,7 @@ class ProductController extends Controller
         }
 
         $perPage = (int) $request->input('per_page', 10);
-        if (! in_array($perPage, [10, 20, 50, 100], true)) {
+        if (!in_array($perPage, [10, 20, 50, 100], true)) {
             $perPage = 10;
         }
 
@@ -84,7 +84,7 @@ class ProductController extends Controller
 
         $data = $request->except(['image', 'id']);
 
-        // Tạo slug tự động từ name nếu không có
+        // Tạo slug tự động nếu chưa có
         if (!$request->has('slug') || empty($request->slug)) {
             $data['slug'] = Str::slug($request->name);
         }
@@ -94,8 +94,15 @@ class ProductController extends Controller
         if ($request->hasFile('image')) {
             $file = $request->file('image');
             $filename = time() . '_' . $file->getClientOriginalName();
-            $file->move(public_path('images/products'), $filename);
-            $product->image = 'images/products/' . $filename;
+
+            // Tạo thư mục nếu chưa tồn tại
+            $destinationPath = public_path('images/book');
+            if (!File::exists($destinationPath)) {
+                File::makeDirectory($destinationPath, 0755, true);
+            }
+
+            $file->move($destinationPath, $filename);
+            $product->image = 'images/book/' . $filename;
         }
 
         $product->save();
@@ -130,13 +137,21 @@ class ProductController extends Controller
         }
 
         if ($request->hasFile('image')) {
-            if (File::exists(public_path($product->image))) {
+            // Xóa ảnh cũ nếu tồn tại
+            if ($product->image && File::exists(public_path($product->image))) {
                 File::delete(public_path($product->image));
             }
+
             $file = $request->file('image');
             $filename = time() . '_' . $file->getClientOriginalName();
-            $file->move(public_path('images/products'), $filename);
-            $data['image'] = 'images/products/' . $filename;
+
+            $destinationPath = public_path('images/book');
+            if (!File::exists($destinationPath)) {
+                File::makeDirectory($destinationPath, 0755, true);
+            }
+
+            $file->move($destinationPath, $filename);
+            $data['image'] = 'images/book/' . $filename;
         }
 
         $product->update($data);
@@ -148,7 +163,7 @@ class ProductController extends Controller
     {
         $product = Product::findOrFail($id);
 
-        if (File::exists(public_path($product->image))) {
+        if ($product->image && File::exists(public_path($product->image))) {
             File::delete(public_path($product->image));
         }
 
@@ -159,10 +174,7 @@ class ProductController extends Controller
 
     public function show($id)
     {
-        // Lấy thông tin sản phẩm dựa trên ID
         $product = Product::with('category')->findOrFail($id);
-
-        // Trả về view hiển thị chi tiết sản phẩm
         return view('admin.products.show', compact('product'));
     }
 }
