@@ -1,123 +1,101 @@
 @extends('layouts.admin')
 
-@section('title', 'Danh sách sản phẩm')
-
 @section('content')
-<div class="container">
-    <h3 class="display-1">Danh sách sản phẩm</h3>
-
-    <div class="card">
-        <div class="card-body">
-            
-            <a href="{{ route('admin.products.create') }}" class="btn btn-inverse-info btn-fw">+ Thêm sản phẩm</a>
-            <div class="row mt-3">
-                <div class="col-12">
-                    <div class="table-responsive">
-                        <div id="example_wrapper" class="dataTables_wrapper dt-bootstrap4 no-footer">
-                            <div class="row">
-                                <div class="col-sm-12 col-md-6">
-                                </div>
-                                <div class="col-sm-12 col-md-6">
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="col-sm-12">
-                                    <table id="example" class="display expandable-table dataTable no-footer" style="width:100%" role="grid">
-                                        <thead>
-                                            <tr role="row">
-                                                <th>ID</th>
-                                                <th>Ảnh</th>
-                                                <th>Tên sách</th>
-                                                <th>Tác giả</th>
-                                                <th>NXB</th>
-                                                <th>Giá</th>
-                                                <th>Số lượng</th>
-                                                <th>Năm XB</th>
-                                                <th>Danh mục</th>
-                                                <th>Hành động</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            @forelse($products as $p)
-                                                <tr>
-                                                    <td>{{ $p->id }}</td>
-                                                    <td>
-                                                        @if($p->image)
-                                                            <img src="{{ asset($p->image) }}" alt="{{ $p->name }}" style="height:40px">
-                                                        @endif
-                                                    </td>
-                                                    <td class="text-wrap">{{ $p->name }}</td>
-                                                    <td class="text-wrap">{{ $p->author }}</td>
-                                                    <td class="text-wrap">{{ $p->publisher }}</td>
-                                                    <td>{{ number_format($p->price, 0) }} đ</td>
-                                                    <td>{{ $p->quantity }}</td>
-                                                    <td>{{ $p->year_of_publication }}</td>
-                                                    <td class="text-wrap">{{ $p->category->name ?? 'N/A' }}</td>
-                                                    <td>
-                                                        <a href="{{ route('admin.products.show', $p->id) }}" class="btn btn-outline-primary btn-sm">Xem</a>
-                                                        <a href="{{ route('admin.products.edit', $p->id) }}" class="btn btn-outline-warning btn-sm">Sửa</a>
-                                                        <form action="{{ route('admin.products.destroy', $p->id) }}" method="POST" style="display:inline">
-                                                            @csrf @method('DELETE')
-                                                            <button type="submit" class="btn btn-outline-danger btn-sm"
-                                                                    onclick="return confirm('Xóa sản phẩm này?')">Xóa</button>
-                                                        </form>
-                                                    </td>
-                                                </tr>
-                                            @empty
-                                                <tr><td colspan="10" class="text-center">Chưa có sản phẩm nào</td></tr>
-                                            @endforelse
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
-                            <form id="product-filter-form" class="col-12">
-
-                            <!-- Phân trang chỉ có trang trước và trang sau -->
-                            <div class="d-flex justify-content-between align-items-center mt-3 flex-wrap gap-2">
-                                <div class="d-flex align-items-center gap-2">
-                                    <div class="btn-group ms-1" role="group" aria-label="Pagination">
-                                        <!-- Nút Previous (Trang trước) -->
-                                        <a class="btn btn-sm btn-outline-secondary {{ $products->onFirstPage() ? 'disabled' : '' }}"
-                                        href="{{ $products->previousPageUrl() }}" aria-label="Previous">&lsaquo; Trang trước</a>
-
-                                        <!-- Nút Next (Trang sau) -->
-                                        <a class="btn btn-sm btn-outline-secondary {{ !$products->hasMorePages() ? 'disabled' : '' }}"
-                                        href="{{ $products->nextPageUrl() }}" aria-label="Next">Trang sau &rsaquo;</a>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
+<div class="card shadow-sm p-3">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h4 class="fw-bold">Books</h4>
+        <div>
+            <button class="btn btn-outline-secondary me-2">Filter</button>
+            <button class="btn btn-outline-secondary me-2">Export</button>
+            <a href="{{ route('admin.products.create') }}" class="btn btn-primary">+ New Book</a>
         </div>
     </div>
-</div>
+
+    <!-- Search box -->
+    <form method="GET" action="{{ route('admin.products.index') }}" class="mb-3">
+        <input type="text" name="q" value="{{ request('q') }}" 
+               class="form-control" placeholder="Search by id or name">
+    </form>
+
+    <!-- Table -->
+    <div class="table-responsive">
+        <table class="table align-middle table-hover">
+            <thead>
+                <tr>
+                    <th>
+                        <input type="checkbox" id="checkAll">
+                    </th>
+                    <th>Book</th>
+                    <th>Price</th>
+                    <th>Category</th>
+                    <th>QTY</th>
+                    <th>Date</th>
+                    <th>Status</th>
+                    <th class="text-end">Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach($products as $product)
+                <tr>
+                    <td>
+                        <input type="checkbox" name="ids[]" value="{{ $product->id }}">
+                    </td>
+                    <td class="d-flex align-items-center">
+                        @if($product->image)
+                            <img src="{{ asset('images/' . $product->image) }}" 
+                                 class="rounded me-2" width="40" height="40" alt="{{ $product->name }}">
+                        @else
+                            <div class="bg-light rounded me-2" style="width:40px;height:40px;"></div>
+                        @endif
+                        <div>
+                            <a href="{{ route('admin.products.show', $product->id) }}" class="fw-bold text-primary">
+                                {{ $product->id }}
+                            </a>
+                            <div>{{ $product->name }}</div>
+                        </div>
+                    </td>
+                    <td>${{ number_format($product->price, 2) }}</td>
+                    <td>{{ $product->category->name ?? '—' }}</td>
+                    <td>{{ $product->quantity }}</td>
+                    <td>{{ $product->created_at->format('m/d/y \a\t h:i A') }}</td>
+                    <td>
+                        @if($product->quantity > 0)
+                            <span class="badge bg-success">Available</span>
+                        @else
+                            <span class="badge bg-danger">Out of Stock</span>
+                        @endif
+                    </td>
+                    <td class="text-end">
+                        <a href="{{ route('admin.products.show', $product->id) }}" class="text-primary me-2" title="View">
+                            <i class="fa-solid fa-eye"></i>
+                        </a>
+                        <a href="{{ route('admin.products.edit', $product->id) }}" class="text-warning me-2" title="Edit">
+                            <i class="fa-solid fa-pen-to-square"></i>
+                        </a>
+                        <form action="{{ route('admin.products.destroy', $product->id) }}" method="POST" class="d-inline">
+                            @csrf @method('DELETE')
+                            <button type="submit" class="btn btn-link p-0 text-danger" onclick="return confirm('Delete this book?')" title="Delete">
+                                <i class="fa-solid fa-trash"></i>
+                            </button>
+                        </form>
+                    </td>
+                </tr>
+                @endforeach
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Pagination -->
+    <div class="d-flex justify-content-between align-items-center mt-3">
+        <div>
+            Showing {{ $products->firstItem() }} - {{ $products->lastItem() }} of {{ $products->total() }}
+        </div>
+        <div class="d-flex justify-content-end">
+            {{ $products->appends(request()->query())->links('pagination::bootstrap-5') }}
+        </div>
+    </div>
+
+
+<!-- Include Font Awesome -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 @endsection
-
-
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script>
-$(document).ready(function() {
-    $('#per_page').on('change', function() {
-        var perPage = $(this).val(); 
-
-        $.ajax({
-            url: '{{ route('admin.products.index') }}',
-            method: 'GET',
-            data: {
-                per_page: perPage,  
-                q: '{{ request('q') }}',  
-                author: '{{ request('author') }}',
-                price_min: '{{ request('price_min') }}',
-                price_max: '{{ request('price_max') }}',
-                category_id: '{{ request('category_id') }}'
-            },
-            success: function(response) {
-                $('#product-list').html(response); 
-            }
-        });
-    });
-});
-</script>

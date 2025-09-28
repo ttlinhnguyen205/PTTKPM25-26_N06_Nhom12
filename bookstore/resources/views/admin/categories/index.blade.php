@@ -23,7 +23,7 @@
                         <table class="table table-striped">
                             <thead>
                                 <tr>
-                                    <th>#</th>
+                                    <th>ID</th>
                                     <th>Tên danh mục</th>
                                     <th>Ngày tạo</th>
                                     <th>Ngày cập nhật</th>
