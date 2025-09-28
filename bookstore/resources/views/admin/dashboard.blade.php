@@ -3,6 +3,7 @@
 
 <head>
   <!-- Required meta tags -->
+   
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
   <title>@yield('title', 'Admin Dashboard')</title>
@@ -16,6 +17,8 @@
   <!-- Plugin css for this page -->
   <link rel="stylesheet" href="{{ asset('vendors/datatables.net-bs4/dataTables.bootstrap4.css') }}">
   <link rel="stylesheet" href="{{ asset('js/select.dataTables.min.css') }}">
+  <link rel="stylesheet" href="{{ asset('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css')}}">
+
   <!-- End plugin css for this page -->
 
   <!-- inject:css -->
