@@ -20,11 +20,17 @@ Route::middleware('auth')->group(function () {
 });
 
 require __DIR__.'/auth.php';
-// User route 
-Route::middleware(['auth', 'userMiddleware'])->group(function(){
-    Route::get('dashboard',[UserController::class, 'index'])->name('dashboard');
-    Route::resource('categories', CategoryController::class);
-});
+// User route
+
+Route::middleware(['auth', 'userMiddleware'])
+    ->prefix('user')   
+    ->name('user.')
+    ->group(function(){
+        Route::get('/dashboard',[UserController::class, 'index'])->name('dashboard');
+        Route::resource('categories', CategoryController::class);
+        Route::get('/products/{id}', [ProductController::class, 'show'])->name('products.show');
+    });
+
 // Admin route
 Route::middleware(['auth', 'adminMiddleware'])
     ->prefix('admin')   
