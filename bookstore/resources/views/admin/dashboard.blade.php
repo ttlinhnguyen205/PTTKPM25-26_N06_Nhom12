@@ -60,8 +60,8 @@
 <!-- Plugin js for this page -->
 <script src="{{ asset('vendors/chart.js/Chart.min.js') }}"></script>
 <script src="{{ asset('vendors/datatables.net/jquery.dataTables.js') }}"></script>
-<script src="{{ asset('vendors/datatables.net-bs4/dataTables.bootstrap4.js') }}"></script>
-<script src="{{ asset('js/dataTables.select.min.js') }}"></script>
+<script src="{{ asset('vendors/.net-bs4/dataTables.bootstrap4.js') }}"></script>
+<script src="{{ asset('js/dataTables.datatablesselect.min.js') }}"></script>
 <!-- End plugin js for this page -->
 
 <!-- inject:js -->

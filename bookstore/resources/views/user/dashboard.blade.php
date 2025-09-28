@@ -7,26 +7,7 @@
     <link rel="stylesheet" href="{{ asset('css/style.css') }}">
 </head>
 <body>
-
-    <!-- Header / Navbar -->
-    <header class="header">
-        <div class="container nav-container">
-            <div class="logo">Readora</div>
-            <nav class="nav">
-                <a href="#">Home</a>
-                <a href="#">Product</a>
-                <a href="#">Author</a>
-                <a href="#">Publisher</a>
-                <a href="#">Contact Us</a>
-                <a href="#">Blog</a>
-            </nav>
-            <div class="nav-right">
-                <a href="#">Account</a>
-                <a href="#">Cart (0)</a>
-            </div>
-        </div>
-    </header>
-
+<x-app-layout>
     <!-- Banner -->
     <section class="banner">
         <div class="container banner-container">
@@ -164,5 +145,5 @@
         </div>
     </footer>
 
-</body>
-</html>
+    
+</x-app-layout>
