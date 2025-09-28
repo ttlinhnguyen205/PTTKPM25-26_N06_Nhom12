@@ -4,11 +4,16 @@ namespace App\Http\Controllers\User;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use App\Models\Product;
 
 class UserController extends Controller
 {
     public function index()
     {
-        return view('user.dashboard');
+        // Lấy toàn bộ sách từ DB
+        $products = Product::all();
+
+        // Truyền sang view user.dashboard
+        return view('user.dashboard', compact('products'));
     }
 }

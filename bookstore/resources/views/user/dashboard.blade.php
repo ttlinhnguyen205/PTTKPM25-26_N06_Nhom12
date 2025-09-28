@@ -50,17 +50,13 @@
                 <button class="tab">On Sale</button>
             </div>
             <div class="book-list">
-                @foreach ([
-                    ['title' => 'Becoming', 'price' => '$81.00', 'img' => '/images/book1.jpg'],
-                    ['title' => 'Stay', 'price' => '$85.00', 'img' => '/images/book2.jpg'],
-                    ['title' => 'The Alice Network', 'price' => '$99.00', 'img' => '/images/book3.jpg'],
-                    ['title' => 'The Last Thing He Told Me', 'price' => '$90.00', 'img' => '/images/book4.jpg'],
-                ] as $book)
+                 @foreach ($products as $book)
                     <div class="book-item">
-                        <img src="{{ $book['img'] }}" alt="{{ $book['title'] }}">
-                        <h3>{{ $book['title'] }}</h3>
-                        <p class="price">{{ $book['price'] }}</p>
-                        <button class="btn-add">Add to Cart</button>
+                        <img src="{{ asset($book->image) }}" alt="{{ $book->name }}">
+                        <h3>{{ $book->name }}</h3>
+                        <p class="price">{{ number_format($book->price) }} VNĐ</p>
+                        <a href="{{ route('user.products.show', $book->id) }}" class="btn-add">📖 Xem chi tiết</a>
+
                     </div>
                 @endforeach
             </div>

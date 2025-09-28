@@ -1,6 +1,13 @@
-@extends('layout')
-
-@section('content')
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Readora - Online Bookstore</title>
+    <link rel="stylesheet" href="{{ asset('css/style.css') }}">
+</head>
+<body>
+<x-app-layout>
 <div class="container mt-4">
     <div class="row">
         {{-- Cột trái: ảnh sách --}}
@@ -23,12 +30,12 @@
 
             <div class="d-flex gap-3 mt-4">
                 {{-- Nút mua ngay --}}
-                <form action="{{ route('checkout.show', $book->id) }}" method="GET">
+                <form action="{{ route('user.checkout.show', $book->id) }}" method="GET">
                     <button class="btn btn-danger btn-lg">🛒 Mua ngay</button>
                 </form>
 
                 {{-- Nút thêm vào giỏ hàng --}}
-                <form method="POST" action="{{ route('cart.add', $book->id) }}">
+                <form method="POST" action="{{ route('user.cart.add', $book->id) }}">
                     @csrf
                     <button class="btn btn-warning btn-lg">➕ Thêm vào giỏ hàng</button>
                 </form>
@@ -53,4 +60,4 @@
         </div>
     </div>
 </div>
-@endsection
+</x-app-layout>
