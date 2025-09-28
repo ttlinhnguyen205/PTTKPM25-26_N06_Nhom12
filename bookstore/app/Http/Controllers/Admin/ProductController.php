@@ -30,20 +30,6 @@ class ProductController extends Controller
             $query->where('category_id', $categoryId);
         }
 
-        if ($request->filled('price_min')) {
-            $query->where('price', '>=', (float) $request->price_min);
-        }
-        if ($request->filled('price_max')) {
-            $query->where('price', '<=', (float) $request->price_max);
-        }
-
-        if ($request->filled('year_from')) {
-            $query->where('year_of_publication', '>=', (int) $request->year_from);
-        }
-        if ($request->filled('year_to')) {
-            $query->where('year_of_publication', '<=', (int) $request->year_to);
-        }
-
         $sort = $request->input('sort', 'latest');
         switch ($sort) {
             case 'price_asc':  $query->orderBy('price', 'asc'); break;
@@ -84,7 +70,6 @@ class ProductController extends Controller
 
         $data = $request->except(['image', 'id']);
 
-        // Tạo slug tự động nếu chưa có
         if (!$request->has('slug') || empty($request->slug)) {
             $data['slug'] = Str::slug($request->name);
         }
@@ -95,7 +80,6 @@ class ProductController extends Controller
             $file = $request->file('image');
             $filename = time() . '_' . $file->getClientOriginalName();
 
-            // Tạo thư mục nếu chưa tồn tại
             $destinationPath = public_path('images/book');
             if (!File::exists($destinationPath)) {
                 File::makeDirectory($destinationPath, 0755, true);
@@ -112,7 +96,7 @@ class ProductController extends Controller
 
     public function edit($id)
     {
-        $product    = Product::findOrFail($id);
+        $product = Product::findOrFail($id);
         $categories = Category::all();
         return view('admin.products.edit', compact('product', 'categories'));
     }
@@ -137,7 +121,6 @@ class ProductController extends Controller
         }
 
         if ($request->hasFile('image')) {
-            // Xóa ảnh cũ nếu tồn tại
             if ($product->image && File::exists(public_path($product->image))) {
                 File::delete(public_path($product->image));
             }
