@@ -6,6 +6,7 @@
 <div class="container">
     <h2 class="mb-4">Thêm sản phẩm</h2>
 
+    {{-- Hiển thị thông báo lỗi --}}
     @if ($errors->any())
         <div class="alert alert-danger">
             <ul class="mb-0">
@@ -16,11 +17,9 @@
         </div>
     @endif
 
-    <div class = "card">
-        <div class = "card-body">
-            <form class="forms-sample">
-
-            <form action="{{ route('admin.products.store') }}" method="POST" enctype="multipart/form-data">
+    <div class="card">
+        <div class="card-body">
+            <form action="{{ route('admin.products.store') }}" method="POST" enctype="multipart/form-data" class="forms-sample">
                 @csrf
 
                 <div class="mb-3">
@@ -91,10 +90,8 @@
                 <button type="submit" class="btn btn-primary mr-2">Lưu</button>
                 <a href="{{ route('admin.products.index') }}" class="btn btn-light">Hủy</a>
             </form>
-        </form>
         </div>
     </div>
-    
 </div>
 
 {{-- Script preview ảnh --}}

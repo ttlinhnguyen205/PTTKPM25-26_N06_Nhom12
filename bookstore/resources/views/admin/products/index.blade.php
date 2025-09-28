@@ -14,7 +14,7 @@
     <!-- Search box -->
     <form method="GET" action="{{ route('admin.products.index') }}" class="mb-3">
         <input type="text" name="q" value="{{ request('q') }}" 
-               class="form-control" placeholder="Search by id or name">
+               class="form-control" placeholder="Search by id, name, author or publisher">
     </form>
 
     <!-- Table -->
@@ -22,9 +22,7 @@
         <table class="table align-middle table-hover">
             <thead>
                 <tr>
-                    <th>
-                        <input type="checkbox" id="checkAll">
-                    </th>
+                    <th><input type="checkbox" id="checkAll"></th>
                     <th>Book</th>
                     <th>Price</th>
                     <th>Category</th>
@@ -42,7 +40,7 @@
                     </td>
                     <td class="d-flex align-items-center">
                         @if($product->image)
-                            <img src="{{ asset('images/' . $product->image) }}" 
+                            <img src="{{ asset($product->image) }}" 
                                  class="rounded me-2" width="40" height="40" alt="{{ $product->name }}">
                         @else
                             <div class="bg-light rounded me-2" style="width:40px;height:40px;"></div>
@@ -57,7 +55,7 @@
                     <td>${{ number_format($product->price, 2) }}</td>
                     <td>{{ $product->category->name ?? '—' }}</td>
                     <td>{{ $product->quantity }}</td>
-                    <td>{{ $product->created_at->format('m/d/y \a\t h:i A') }}</td>
+                    <td>{{ $product->created_at->format('m/d/Y \a\t h:i A') }}</td>
                     <td>
                         @if($product->quantity > 0)
                             <span class="badge bg-success">Available</span>
@@ -94,8 +92,16 @@
             {{ $products->appends(request()->query())->links('pagination::bootstrap-5') }}
         </div>
     </div>
-
+</div>
 
 <!-- Include Font Awesome -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+<!-- Optional: Script check all checkboxes -->
+<script>
+document.getElementById('checkAll').addEventListener('change', function() {
+    let checkboxes = document.querySelectorAll('input[name="ids[]"]');
+    checkboxes.forEach(cb => cb.checked = this.checked);
+});
+</script>
 @endsection
