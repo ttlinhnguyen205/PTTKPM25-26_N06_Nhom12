@@ -24,9 +24,8 @@ class CategorySeeder extends Seeder
         ];
 
         foreach ($categories as $category) {
-            // Nếu muốn tránh duplicate, dùng updateOrCreate
             Category::updateOrCreate(
-                ['slug' => Str::slug($category)], // điều kiện tìm theo slug
+                ['slug' => Str::slug($category)],
                 ['name' => $category, 'slug' => Str::slug($category)]
             );
         }
