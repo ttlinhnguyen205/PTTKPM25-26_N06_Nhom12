@@ -9,14 +9,12 @@ use Illuminate\Support\Facades\Session;
 
 class CartController extends Controller
 {
-    // Hiển thị giỏ hàng
     public function index()
     {
         $cart = Session::get('cart', []);
         return view('user.cart.index', compact('cart'));
     }
 
-    // Thêm vào giỏ
     public function add($id)
     {
         $product = Product::findOrFail($id);
@@ -35,7 +33,6 @@ class CartController extends Controller
         return redirect()->back()->with('success', 'Đã thêm vào giỏ hàng!');
     }
 
-    // Xóa khỏi giỏ
     public function remove($id)
     {
         $cart = Session::get('cart', []);
