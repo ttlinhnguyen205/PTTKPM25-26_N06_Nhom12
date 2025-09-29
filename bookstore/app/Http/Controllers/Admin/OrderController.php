@@ -44,14 +44,13 @@ class OrderController extends Controller
         Order::create([
             'customer_id' => $request->customer_id,
             'address_id' => $request->address_id,
-            'status' => 'pending', // Trạng thái mặc định là 'pending'
-            'total_money' => 0, // Khởi tạo giá trị tổng tiền (sẽ cập nhật sau)
+            'status' => 'pending',
+            'total_money' => 0, //  cập nhật sau
         ]);
 
         return redirect()->route('admin.orders.index')->with('success', 'Thêm đơn hàng thành công');
     }
 
-    // Form chỉnh sửa trạng thái đơn hàng
     public function edit($id)
     {
         $order = Order::with(['customer', 'address'])->findOrFail($id);
@@ -59,7 +58,6 @@ class OrderController extends Controller
         return view('admin.orders.edit', compact('order', 'statuses'));
     }
 
-    // Cập nhật trạng thái đơn hàng
     public function update(Request $request, $id)
     {
         $order = Order::findOrFail($id);
@@ -68,16 +66,14 @@ class OrderController extends Controller
             'status' => 'required|in:pending,confirmed,shipping,completed,cancelled'
         ]);
 
-        // Cập nhật trạng thái đơn hàng
         $order->update([
             'status' => $request->status,
-            'total_money' => $this->calculateTotalMoney($order->id), // Tính lại tổng tiền sau khi cập nhật trạng thái
+            'total_money' => $this->calculateTotalMoney($order->id),
         ]);
 
         return redirect()->route('admin.orders.index')->with('success', 'Cập nhật trạng thái đơn hàng thành công');
     }
 
-    // Tính tổng tiền của đơn hàng
     private function calculateTotalMoney($orderId)
     {
         $orderDetails = Order::find($orderId)->orderDetails;
@@ -90,7 +86,6 @@ class OrderController extends Controller
         return $total;
     }
 
-    // Xóa đơn hàng
     public function destroy($id)
     {
         $order = Order::findOrFail($id);

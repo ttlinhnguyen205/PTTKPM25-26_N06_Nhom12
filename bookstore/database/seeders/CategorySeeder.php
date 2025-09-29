@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
 use App\Models\Category;
+use Illuminate\Support\Str;
 
 class CategorySeeder extends Seeder
 {
@@ -23,7 +24,11 @@ class CategorySeeder extends Seeder
         ];
 
         foreach ($categories as $category) {
-            Category::create(['name' => $category]);
+            // Nếu muốn tránh duplicate, dùng updateOrCreate
+            Category::updateOrCreate(
+                ['slug' => Str::slug($category)], // điều kiện tìm theo slug
+                ['name' => $category, 'slug' => Str::slug($category)]
+            );
         }
     }
 }
