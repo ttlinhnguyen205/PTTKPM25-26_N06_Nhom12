@@ -22,7 +22,6 @@ class CategoryController extends Controller
 
     public function store(Request $request)
     {
-        // Validate dữ liệu
         $request->validate([
             'name' => 'required|string|max:255',
         ]);
@@ -32,10 +31,9 @@ class CategoryController extends Controller
 
         // Kiểm tra xem slug có bị trùng không
         if (Category::where('slug', $slug)->exists()) {
-            $slug = $slug . '-' . Str::random(5); // Thêm mã ngẫu nhiên nếu slug trùng
+            $slug = $slug . '-' . Str::random(5); 
         }
 
-        // Lưu danh mục mới
         Category::create([
             'name' => $request->name,
             'slug' => $slug
@@ -52,23 +50,17 @@ class CategoryController extends Controller
 
     public function update(Request $request, $id)
     {
-        // Validate dữ liệu
         $request->validate([
             'name' => 'required|string|max:255',
         ]);
 
-        // Lấy danh mục hiện tại
         $category = Category::findOrFail($id);
-
-        // Tạo slug mới nếu tên thay đổi
         $slug = Str::slug($request->name);
 
-        // Kiểm tra xem slug có bị trùng không
         if (Category::where('slug', $slug)->where('id', '!=', $id)->exists()) {
-            $slug = $slug . '-' . Str::random(5); // Thêm mã ngẫu nhiên nếu slug trùng
+            $slug = $slug . '-' . Str::random(5); 
         }
 
-        // Cập nhật danh mục
         $category->update([
             'name' => $request->name,
             'slug' => $slug
@@ -79,7 +71,6 @@ class CategoryController extends Controller
 
     public function destroy($id)
     {
-        // Xóa danh mục
         Category::destroy($id);
 
         return redirect()->route('admin.categories.index')->with('success', 'Xóa danh mục thành công');

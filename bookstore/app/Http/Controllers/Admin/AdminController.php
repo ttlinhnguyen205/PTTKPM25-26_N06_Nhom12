@@ -23,16 +23,15 @@ class AdminController extends Controller
                              ->take(5)
                              ->get();
 
-        // Tính tổng tiền của 5 đơn hàng mới nhất (nếu cần)
-        $recentOrdersTotal = $recentOrders->sum('total_money'); // Tính tổng tiền của các đơn hàng mới nhất
+        // Tính tổng tiền của 5 đơn hàng mới nhất 
+        $recentOrdersTotal = $recentOrders->sum('total_money');
 
-        // Trả dữ liệu về view admin.dashboard
         return view('admin.dashboard', compact(
             'totalProducts', 
             'totalCategories', 
             'totalOrders', 
             'recentOrders',
-            'recentOrdersTotal' // Truyền tổng tiền của các đơn hàng mới nhất
+            'recentOrdersTotal'
         ));
     }
 }
