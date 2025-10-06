@@ -2,12 +2,12 @@
 
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Http\Request;
 
 use App\Http\Controllers\User\UserController;
 use App\Http\Controllers\User\CartController;
-
 use App\Http\Controllers\User\CheckoutController;
-use App\Http\Controllers\User\ProductController as UserProductController; 
+use App\Http\Controllers\User\ProductController as UserProductController;
 
 use App\Http\Controllers\Admin\AdminController;
 use App\Http\Controllers\Admin\CategoryController;
@@ -17,42 +17,61 @@ use App\Http\Controllers\Admin\ProductController as AdminProductController;
 use App\Http\Controllers\AddressController;
 use App\Http\Controllers\OrderDetailController;
 
-
-
 Route::get('/', function () {
     return view('welcome');
 });
+
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
-require __DIR__.'/auth.php';
-// User route
+require __DIR__ . '/auth.php';
 
+Route::get('/dashboard', function (Request $request) {
+    $user = $request->user();
+    if (!$user) {
+        return redirect()->route('login');
+    }
+
+    $isAdmin =
+        (($user->role ?? null) === 'admin') ||
+        (($user->is_admin ?? false) === true) ||
+        (method_exists($user, 'isAdmin') && $user->isAdmin());
+
+    if ($isAdmin) {
+        return redirect()->route('admin.dashboard');
+    }
+
+    return redirect()->route('user.dashboard');
+})->middleware(['auth'])->name('dashboard');
+
+// User route
 Route::middleware(['auth', 'userMiddleware'])
-    ->prefix('user')   
+    ->prefix('user')
     ->name('user.')
-    ->group(function(){
-        Route::get('/dashboard',[UserController::class, 'index'])->name('dashboard');
+    ->group(function () {
+        Route::get('/dashboard', [UserController::class, 'index'])->name('dashboard');
+
+        // Browsing & shopping
         Route::resource('categories', CategoryController::class);
         Route::get('/products/{id}', [UserProductController::class, 'show'])->name('products.show');
-               
+
+        // Cart
         Route::post('/cart/{id}', [CartController::class, 'add'])->name('cart.add');
         Route::delete('/cart/{id}', [CartController::class, 'remove'])->name('cart.remove');
         Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
 
-
+        // Checkout
         Route::get('/checkout/{id}', [CheckoutController::class, 'show'])->name('checkout.show');
         Route::post('/checkout/{id}', [CheckoutController::class, 'process'])->name('checkout.process');
-        
     });
 
-// Admin route
+// Admin route 
 Route::middleware(['auth', 'adminMiddleware'])
-    ->prefix('admin')   
-    ->name('admin.')   
+    ->prefix('admin')
+    ->name('admin.')
     ->group(function () {
         Route::get('/dashboard', [AdminController::class, 'index'])->name('dashboard');
 
@@ -62,4 +81,3 @@ Route::middleware(['auth', 'adminMiddleware'])
         Route::resource('products', AdminProductController::class);
         Route::resource('orders', \App\Http\Controllers\Admin\OrderController::class);
     });
-
