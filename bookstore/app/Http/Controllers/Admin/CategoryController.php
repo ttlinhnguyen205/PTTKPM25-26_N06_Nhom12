@@ -5,13 +5,16 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Category;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
 class CategoryController extends Controller
 {
     public function index()
     {
-        $categories = Category::all();
+        // Phân trang nhẹ nhàng; nếu muốn lấy hết thì thay ->paginate() bằng ->get()
+        $categories = Category::orderByDesc('created_at')->paginate(12);
+
         return view('admin.categories.index', compact('categories'));
     }
 
@@ -22,57 +25,66 @@ class CategoryController extends Controller
 
     public function store(Request $request)
     {
-        $request->validate([
-            'name' => 'required|string|max:255',
+        $data = $request->validate([
+            'name' => ['required', 'string', 'max:255'],
         ]);
 
-        // Tạo slug từ tên (name)
-        $slug = Str::slug($request->name);
+        $data['slug'] = $this->makeUniqueSlug($data['name']);
 
-        // Kiểm tra xem slug có bị trùng không
-        if (Category::where('slug', $slug)->exists()) {
-            $slug = $slug . '-' . Str::random(5); 
-        }
+        Category::create($data);
 
-        Category::create([
-            'name' => $request->name,
-            'slug' => $slug
-        ]);
-
-        return redirect()->route('admin.categories.index')->with('success', 'Thêm danh mục thành công');
+        return redirect()
+            ->route('admin.categories.index')
+            ->with('success', 'Thêm danh mục thành công');
     }
 
-    public function edit($id)
+    public function edit(Category $category) // route model binding
     {
-        $category = Category::findOrFail($id);
         return view('admin.categories.edit', compact('category'));
     }
 
-    public function update(Request $request, $id)
+    public function update(Request $request, Category $category)
     {
-        $request->validate([
-            'name' => 'required|string|max:255',
+        $data = $request->validate([
+            'name' => ['required', 'string', 'max:255'],
         ]);
 
-        $category = Category::findOrFail($id);
-        $slug = Str::slug($request->name);
-
-        if (Category::where('slug', $slug)->where('id', '!=', $id)->exists()) {
-            $slug = $slug . '-' . Str::random(5); 
+        // Chỉ cập nhật slug khi name thay đổi
+        if ($data['name'] !== $category->name) {
+            $data['slug'] = $this->makeUniqueSlug($data['name'], $category->id);
         }
 
-        $category->update([
-            'name' => $request->name,
-            'slug' => $slug
-        ]);
+        $category->update($data);
 
-        return redirect()->route('admin.categories.index')->with('success', 'Cập nhật danh mục thành công');
+        return redirect()
+            ->route('admin.categories.index')
+            ->with('success', 'Cập nhật danh mục thành công');
     }
 
-    public function destroy($id)
+    public function destroy(Category $category)
     {
-        Category::destroy($id);
+        $category->delete();
 
-        return redirect()->route('admin.categories.index')->with('success', 'Xóa danh mục thành công');
+        return redirect()
+            ->route('admin.categories.index')
+            ->with('success', 'Xóa danh mục thành công');
+    }
+
+    protected function makeUniqueSlug(string $name, ?int $ignoreId = null): string
+    {
+        $base = Str::slug($name);
+        $slug = $base;
+        $i = 2;
+
+        while (
+            Category::where('slug', $slug)
+                ->when($ignoreId, fn ($q) => $q->where('id', '!=', $ignoreId))
+                ->exists()
+        ) {
+            $slug = "{$base}-{$i}";
+            $i++;
+        }
+
+        return $slug;
     }
 }

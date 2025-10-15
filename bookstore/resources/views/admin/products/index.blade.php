@@ -1,13 +1,22 @@
 @extends('layouts.admin')
 
 @section('content')
+
+    @if (session('success'))
+        <div class="alert alert-success alert-dismissible fade show mt-2" role="alert">
+            <i class="fa-solid fa-circle-check me-2"></i> 
+            {{ session('success') }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    @endif
+
 <div class="card shadow-sm p-3">
     <div class="d-flex justify-content-between align-items-center mb-3">
         <h4 class="fw-bold">Books</h4>
         <div>
             <button class="btn btn-outline-secondary me-2">Filter</button>
             <button class="btn btn-outline-secondary me-2">Export</button>
-            <a href="{{ route('admin.products.create') }}" class="btn btn-primary">+ New Book</a>
+            <a href="{{ route('admin.products.create') }}" class="btn btn-primary">+ Thêm sách mới</a>
         </div>
     </div>
 
@@ -23,13 +32,12 @@
             <thead>
                 <tr>
                     <th><input type="checkbox" id="checkAll"></th>
-                    <th>Book</th>
-                    <th>Price</th>
-                    <th>Category</th>
-                    <th>QTY</th>
-                    <th>Date</th>
-                    <th>Status</th>
-                    <th class="text-end">Action</th>
+                    <th>Sách</th>
+                    <th>Giá</th>
+                    <th>Danh mục</th>
+                    <th>Số lượng</th>
+                    <th>Trạng thái</th>
+                    <th class="text-end">Hành động</th>
                 </tr>
             </thead>
             <tbody>
@@ -52,10 +60,9 @@
                             <div>{{ $product->name }}</div>
                         </div>
                     </td>
-                    <td>${{ number_format($product->price, 2) }}</td>
+                    <td>{{ number_format($product->price, 0, ',', '.') }} đ</td>
                     <td>{{ $product->category->name ?? '—' }}</td>
                     <td>{{ $product->quantity }}</td>
-                    <td>{{ $product->created_at->format('m/d/Y \a\t h:i A') }}</td>
                     <td>
                         @if($product->quantity > 0)
                             <span class="badge bg-success">Available</span>

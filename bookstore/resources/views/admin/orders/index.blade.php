@@ -3,52 +3,208 @@
 @section('title', 'Danh sách đơn hàng')
 
 @section('content')
-<div class="container">
-    <h2>Danh sách đơn hàng</h2>
+@php
+    use Illuminate\Support\Str;
 
-    @if(session('success'))
-        <div class="alert alert-success">{{ session('success') }}</div>
-    @endif
+    $statusParam = request('status');
+    $q = request('q');
 
-    @if(Auth::user()->usertype !== 'admin')
-        <a href="{{ route('orders.create') }}" class="btn btn-primary mb-3">+ Đặt hàng</a>
-    @endif
+    // Nếu controller có truyền $counts thì dùng, không thì fallback
+    $counts = $counts ?? [
+        'all'        => $orders->total(),
+        'shipping'   => $shippingCount ?? 0,
+        'completed'  => $completedCount ?? 0,
+        'cancelled'  => $cancelledCount ?? 0,
+    ];
 
-    <table class="table table-bordered">
+    function statusBadge($status) {
+        return match($status) {
+            'pending'   => 'badge bg-secondary',
+            'confirmed' => 'badge bg-info',
+            'shipping'  => 'badge bg-primary',
+            'completed' => 'badge bg-success',
+            'cancelled' => 'badge bg-danger',
+            default     => 'badge bg-light text-dark',
+        };
+    }
+@endphp
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+
+<style>
+  .card-ui{border:1px solid #e5e7eb;border-radius:16px;background:#fff}
+  .tabs-wrap{border:1px solid #e5e7eb;border-radius:12px;padding:6px;background:#fff}
+  .tab-btn{border-radius:999px;padding:.45rem .9rem;font-weight:600;border:0;background:transparent;color:#6b7280}
+  .tab-active{background:#e7f0ff;color:#2563eb}
+  .table-rounded thead th{background:#f8fafc;color:#6b7280;font-weight:600}
+  .thumb{width:36px;height:36px;border-radius:6px;object-fit:cover;background:#f3f4f6}
+  .icon-btn{display:inline-flex;align-items:center;justify-content:center;width:30px;height:30px;border-radius:999px;border:1px solid #e5e7eb;background:#fff}
+  .icon-btn:hover{background:#f9fafb}
+  .search-input{border-radius:12px;padding:.6rem .9rem .6rem 2.2rem;border:1px solid #e5e7eb}
+  .search-ico{position:absolute;left:.8rem;top:50%;transform:translateY(-50%);color:#9ca3af}
+</style>
+
+<div class="container-fluid px-3 px-md-4">
+  @if(session('success'))
+    <div class="alert alert-success">{{ session('success') }}</div>
+  @endif
+
+  <div class="card-ui p-3 p-md-4">
+    {{-- Top actions --}}
+    <div class="d-flex flex-wrap gap-2 justify-content-between align-items-center mb-3">
+      <form method="GET" action="{{ route('admin.orders.index') }}" class="flex-grow-1 me-2" style="max-width:520px;">
+        <div class="position-relative">
+          <i class="fa-solid fa-magnifying-glass search-ico"></i>
+          <input type="text" name="q" value="{{ $q }}" class="form-control search-input"
+                 placeholder="Search for id, name product">
+          @if($statusParam) <input type="hidden" name="status" value="{{ $statusParam }}"> @endif
+        </div>
+      </form>
+
+      <div class="d-flex gap-2">
+        <a class="btn btn-outline-secondary"><i class="fa-solid fa-filter me-1"></i> Filter</a>
+        <a class="btn btn-outline-secondary"><i class="fa-solid fa-file-export me-1"></i> Export</a>
+        <a href="{{ route('admin.orders.create') }}" class="btn btn-primary">
+          <i class="fa-solid fa-plus me-1"></i> New Order
+        </a>
+      </div>
+    </div>
+
+    {{-- Tabs --}}
+    <div class="tabs-wrap mb-3">
+      <div class="d-flex flex-wrap gap-2">
+        <a href="{{ route('admin.orders.index', array_filter(['q'=>$q])) }}"
+           class="tab-btn {{ !$statusParam ? 'tab-active' : '' }}">
+          All Orders ({{ $counts['all'] }})
+        </a>
+        <a href="{{ route('admin.orders.index', array_filter(['status'=>'shipping','q'=>$q])) }}"
+           class="tab-btn {{ $statusParam==='shipping' ? 'tab-active' : '' }}">
+          Shipping ({{ $counts['shipping'] }})
+        </a>
+        <a href="{{ route('admin.orders.index', array_filter(['status'=>'completed','q'=>$q])) }}"
+           class="tab-btn {{ $statusParam==='completed' ? 'tab-active' : '' }}">
+          Completed ({{ $counts['completed'] }})
+        </a>
+        <a href="{{ route('admin.orders.index', array_filter(['status'=>'cancelled','q'=>$q])) }}"
+           class="tab-btn {{ $statusParam==='cancelled' ? 'tab-active' : '' }}">
+          Cancel ({{ $counts['cancelled'] }})
+        </a>
+      </div>
+    </div>
+
+    {{-- Table --}}
+    <div class="table-responsive">
+      <table class="table align-middle table-hover table-rounded">
         <thead>
-            <tr>
-                <th>ID</th>
-                <th>Khách hàng</th>
-                <th>Địa chỉ</th>
-                <th>Ngày tạo</th>
-                <th>Tổng tiền</th>
-                <th>Trạng thái</th>
-                <th>Hành động</th>
-            </tr>
+          <tr>
+            <th style="width:36px"><input type="checkbox" id="checkAll"></th>
+            <th>Orders</th>
+            <th>Customer</th>
+            <th>Price</th>
+            <th>Date</th>
+            <th>Payment</th>
+            <th>Status</th>
+            <th class="text-end">Action</th>
+          </tr>
         </thead>
         <tbody>
-            @forelse($orders as $order)
+          @forelse($orders as $order)
+            @php
+                // Lấy sản phẩm đầu tiên trong đơn (nếu có) để hiển thị ảnh + tên
+                $firstDetail = $order->orderDetails->first() ?? null;
+                $product = $firstDetail?->product;
+                $thumb = '';
+                if ($product && $product->image) {
+                    $thumb = asset(Str::startsWith($product->image, 'images/book/')
+                            ? $product->image
+                            : 'images/book/' . ltrim($product->image, '/'));
+                }
+                // Payment: nếu có field payment_status thì dùng; nếu không, suy luận theo status
+                $payment = $order->payment_status ?? ($order->status === 'completed' ? 'paid' : 'unpaid');
+                $paymentClass = $payment === 'paid' ? 'badge bg-success-subtle text-success' : 'badge bg-warning-subtle text-warning';
+                $statusClass  = statusBadge($order->status);
+            @endphp
             <tr>
-                <td>{{ $order->id }}</td>
-                <td>{{ $order->customer->name ?? 'N/A' }}</td>
-                <td>{{ $order->address->address ?? 'N/A' }}</td>
-                <td>{{ $order->date }}</td>
-                <td>{{ number_format($order->totalMoney, 0) }} đ</td>
-                <td>{{ ucfirst($order->status) }}</td>
-                <td>
-                    <a href="{{ route('orders.show', $order->id) }}" class="btn btn-info btn-sm">Xem</a>
-                    @if(Auth::user()->usertype === 'admin')
-                        <form action="{{ route('orders.destroy', $order->id) }}" method="POST" style="display:inline;">
-                            @csrf @method('DELETE')
-                            <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Xóa đơn hàng này?')">Xóa</button>
-                        </form>
-                    @endif
-                </td>
+              <td><input type="checkbox" name="ids[]" value="{{ $order->id }}"></td>
+
+              {{-- Orders (thumb + id link + product name) --}}
+              <td>
+                <div class="d-flex align-items-center">
+                  @if($thumb)
+                    <img src="{{ $thumb }}" class="thumb me-2" alt="thumb">
+                  @else
+                    <div class="thumb me-2"></div>
+                  @endif
+                  <div>
+                    <a href="{{ route('admin.orders.show', $order->id) }}" class="text-primary small fw-semibold">0{{ $order->id }}</a>
+                    <div class="text-muted">{{ $product->name ?? '—' }}</div>
+                  </div>
+                </div>
+              </td>
+
+              <td>{{ $order->customer->name ?? 'N/A' }}</td>
+              <td>${{ number_format($order->total_money ?? 0, 2) }}</td>
+              <td>{{ \Carbon\Carbon::parse($order->date)->format('m/d/Y') }}</td>
+
+              <td><span class="{{ $paymentClass }}">{{ Str::title($payment) }}</span></td>
+              <td><span class="{{ $statusClass }}">{{ Str::title($order->status) }}</span></td>
+
+              <td class="text-end">
+                <a href="{{ route('admin.orders.show', $order->id) }}" class="icon-btn me-1" title="View">
+                  <i class="fa-regular fa-eye"></i>
+                </a>
+                <a href="{{ route('admin.orders.edit', $order->id) }}" class="icon-btn me-1" title="Edit">
+                  <i class="fa-regular fa-pen-to-square"></i>
+                </a>
+                <form action="{{ route('admin.orders.destroy', $order->id) }}" method="POST" class="d-inline"
+                      onsubmit="return confirm('Xóa đơn hàng này?')">
+                  @csrf @method('DELETE')
+                  <button type="submit" class="icon-btn text-danger" title="Delete">
+                    <i class="fa-regular fa-trash-can"></i>
+                  </button>
+                </form>
+              </td>
             </tr>
-            @empty
-            <tr><td colspan="7" class="text-center">Chưa có đơn hàng nào</td></tr>
-            @endforelse
+          @empty
+            <tr>
+              <td colspan="8" class="text-center text-muted py-4">Chưa có đơn hàng nào</td>
+            </tr>
+          @endforelse
         </tbody>
-    </table>
+      </table>
+    </div>
+
+    {{-- Footer: pagination + page size --}}
+    <div class="d-flex justify-content-between align-items-center mt-2">
+      <div class="text-muted small">
+        {{ $orders->firstItem() ?? 0 }} - {{ $orders->lastItem() ?? 0 }} of {{ $orders->total() ?? $orders->count() }} Pages
+      </div>
+
+      <div class="d-flex align-items-center gap-2">
+        <form method="GET" action="{{ route('admin.orders.index') }}" class="d-flex align-items-center">
+          @if($statusParam) <input type="hidden" name="status" value="{{ $statusParam }}"> @endif
+          @if($q) <input type="hidden" name="q" value="{{ $q }}"> @endif
+          <label class="me-1 small text-muted">The page on</label>
+          <select name="page_size" class="form-select form-select-sm" onchange="this.form.submit()">
+            @foreach([9, 15, 30] as $size)
+              <option value="{{ $size }}" {{ (int)request('page_size', 9) === $size ? 'selected' : '' }}>
+                {{ $size }}
+              </option>
+            @endforeach
+          </select>
+        </form>
+        <div class="ms-2">
+          {{ $orders->appends(request()->query())->links('pagination::bootstrap-5') }}
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
+
+<script>
+  const ca = document.getElementById('checkAll');
+  if (ca) ca.addEventListener('change', function(){
+    document.querySelectorAll('input[name="ids[]"]').forEach(cb => cb.checked = this.checked);
+  });
+</script>
 @endsection

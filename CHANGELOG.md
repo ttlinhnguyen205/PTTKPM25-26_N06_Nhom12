@@ -24,3 +24,5 @@
 
 ### Fixed
 - Sửa lỗi giao diện không hiển thị Navbar.
+## [v1.0.2] - 2025-10-10
+- Sửa giao diện và chức năng order, sản phẩm

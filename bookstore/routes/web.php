@@ -80,4 +80,5 @@ Route::middleware(['auth', 'adminMiddleware'])
         Route::resource('categories', \App\Http\Controllers\Admin\CategoryController::class);
         Route::resource('products', AdminProductController::class);
         Route::resource('orders', \App\Http\Controllers\Admin\OrderController::class);
+
     });

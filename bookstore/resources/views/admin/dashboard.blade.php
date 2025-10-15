@@ -18,11 +18,15 @@
   <link rel="stylesheet" href="{{ asset('vendors/datatables.net-bs4/dataTables.bootstrap4.css') }}">
   <link rel="stylesheet" href="{{ asset('js/select.dataTables.min.css') }}">
   <link rel="stylesheet" href="{{ asset('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css')}}">
+  <link rel="stylesheet" href="{{ asset('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/')}}">
+
+
 
   <!-- End plugin css for this page -->
 
   <!-- inject:css -->
   <link rel="stylesheet" href="{{ asset('css/vertical-layout-light/style.css') }}">
+
   <!-- endinject -->
 
   <link rel="shortcut icon" href="{{ asset('images/favicon.png') }}" />

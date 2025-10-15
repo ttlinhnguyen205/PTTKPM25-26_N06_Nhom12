@@ -3,104 +3,141 @@
 @section('title', 'Thêm sản phẩm')
 
 @section('content')
-<div class="container">
-    <h2 class="mb-4">Thêm sản phẩm</h2>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
 
-    {{-- Hiển thị thông báo lỗi --}}
-    @if ($errors->any())
-        <div class="alert alert-danger">
-            <ul class="mb-0">
-                @foreach ($errors->all() as $error)
-                    <li>{{ $error }}</li>
-                @endforeach
-            </ul>
-        </div>
-    @endif
+<style>
+  .ui-card{border:1px solid #e5e7eb;border-radius:16px;background:#fff}
+  .ui-section{border:1px solid #e5e7eb;border-radius:16px;background:#fff}
+  .fld{border-radius:12px;padding:10px 14px;border:1px solid #e5e7eb}
+  .fld:focus{outline:none;border-color:#3b82f6;box-shadow:0 0 0 .15rem rgba(59,130,246,.15)}
+  .lbl{font-weight:600;font-size:.875rem;color:#374151}
+  .hint{font-size:.85rem;color:#6b7280}
+  .drop{border:2px dashed #cfe0ff;background:#f3f7ff;border-radius:12px;height:180px;
+        display:flex;align-items:center;justify-content:center;flex-direction:column;gap:8px;color:#3b82f6;cursor:pointer}
+  .btn-pill{border-radius:12px;padding:.625rem 1rem}
+</style>
 
-    <div class="card">
-        <div class="card-body">
-            <form action="{{ route('admin.products.store') }}" method="POST" enctype="multipart/form-data" class="forms-sample">
-                @csrf
-
-                <div class="mb-3">
-                    <label class="form-label">ID (tùy chọn)</label>
-                    <input type="number" name="id" class="form-control" value="{{ old('id') }}" min="1" placeholder="Bỏ trống để hệ thống tự tạo">
-                </div>
-
-                <div class="mb-3">
-                    <label class="form-label">Tên sản phẩm</label>
-                    <input type="text" name="name" class="form-control" value="{{ old('name') }}" required>
-                </div>
-
-                <div class="mb-3">
-                    <label class="form-label">Giá</label>
-                    <input type="number" step="0.01" name="price" class="form-control" value="{{ old('price') }}" required>
-                </div>
-
-                <div class="mb-3">
-                    <label class="form-label">Số lượng</label>
-                    <input type="number" name="quantity" class="form-control" value="{{ old('quantity') }}" required>
-                </div>
-
-                <div class="mb-3">
-                    <label class="form-label">Tác giả</label>
-                    <input type="text" name="author" class="form-control" value="{{ old('author') }}">
-                </div>
-
-                <div class="mb-3">
-                    <label class="form-label">Nhà xuất bản</label>
-                    <input type="text" name="publisher" class="form-control" value="{{ old('publisher') }}">
-                </div>
-
-                <div class="mb-3">
-                    <label class="form-label">Số trang</label>
-                    <input type="number" name="page" class="form-control" value="{{ old('page') }}">
-                </div>
-
-                <div class="mb-3">
-                    <label class="form-label">Mô tả</label>
-                    <textarea name="description" class="form-control" rows="4">{{ old('description') }}</textarea>
-                </div>
-
-                <div class="mb-3">
-                    <label class="form-label">Năm xuất bản</label>
-                    <input type="number" name="year_of_publication" class="form-control" value="{{ old('year_of_publication') }}">
-                </div>
-
-                <div class="mb-3">
-                    <label class="form-label">Danh mục</label>
-                    <select name="category_id" class="form-control" required>
-                        <option value="">-- Chọn danh mục --</option>
-                        @foreach($categories as $category)
-                            <option value="{{ $category->id }}" {{ old('category_id') == $category->id ? 'selected' : '' }}>
-                                {{ $category->name }}
-                            </option>
-                        @endforeach
-                    </select>
-                </div>
-
-                <div class="mb-3">
-                    <label class="form-label">Ảnh sản phẩm</label>
-                    <input type="file" name="image" class="form-control" onchange="previewImage(event)">
-                    <div class="mt-2">
-                        <img id="preview" alt="Preview ảnh" class="img-fluid d-none" style="max-height: 200px;">
-                    </div>
-                </div>
-
-                <button type="submit" class="btn btn-primary mr-2">Lưu</button>
-                <a href="{{ route('admin.products.index') }}" class="btn btn-light">Hủy</a>
-            </form>
-        </div>
+<div class="container-fluid px-3 px-md-4">
+  {{-- Errors --}}
+  @if ($errors->any())
+    <div class="alert alert-danger">
+      <ul class="mb-0">
+        @foreach ($errors->all() as $error) <li>{{ $error }}</li> @endforeach
+      </ul>
     </div>
+  @endif
+
+  <form action="{{ route('admin.products.store') }}" method="POST" enctype="multipart/form-data">
+    @csrf
+
+    <div class="ui-card p-3 p-md-4">
+      <div class="row g-4">
+        {{-- LEFT: Product Information (đúng các trường bạn gửi) --}}
+        <div class="col-lg-7">
+          <div class="ui-section p-3 p-md-4 h-100">
+            <h5 class="fw-bold mb-1">Product Information</h5>
+            <p class="hint mb-4">Lorem ipsum dolor sit amet consectetur. Non ac nulla aliquam aenean in velit mattis.</p>
+
+            <div class="mb-3">
+              <label class="lbl">ID (tùy chọn)</label>
+              <input type="number" name="id" class="form-control fld" value="{{ old('id') }}" min="1" placeholder="Bỏ trống để hệ thống tự tạo">
+            </div>
+
+            <div class="mb-3">
+              <label class="lbl">Tên sản phẩm</label>
+              <input type="text" name="name" class="form-control fld" value="{{ old('name') }}" required>
+            </div>
+
+            <div class="row g-3">
+              <div class="col-md-6">
+                <label class="lbl">Giá</label>
+                <input type="number" step="0.01" name="price" class="form-control fld" value="{{ old('price') }}" required>
+              </div>
+              <div class="col-md-6">
+                <label class="lbl">Số lượng</label>
+                <input type="number" name="quantity" class="form-control fld" value="{{ old('quantity') }}" required>
+              </div>
+            </div>
+
+            <div class="row g-3 mt-1">
+              <div class="col-md-6">
+                <label class="lbl">Tác giả</label>
+                <input type="text" name="author" class="form-control fld" value="{{ old('author') }}">
+              </div>
+              <div class="col-md-6">
+                <label class="lbl">Nhà xuất bản</label>
+                <input type="text" name="publisher" class="form-control fld" value="{{ old('publisher') }}">
+              </div>
+            </div>
+
+            <div class="row g-3 mt-1">
+              <div class="col-md-6">
+                <label class="lbl">Số trang</label>
+                <input type="number" name="page" class="form-control fld" value="{{ old('page') }}">
+              </div>
+              <div class="col-md-6">
+                <label class="lbl">Năm xuất bản</label>
+                <input type="number" name="year_of_publication" class="form-control fld" value="{{ old('year_of_publication') }}">
+              </div>
+            </div>
+
+            <div class="mt-3">
+              <label class="lbl">Mô tả</label>
+              <textarea name="description" class="form-control fld" rows="4">{{ old('description') }}</textarea>
+            </div>
+
+            <div class="mt-3">
+              <label class="lbl">Danh mục</label>
+              <select name="category_id" class="form-select fld" required>
+                <option value="">-- Chọn danh mục --</option>
+                @foreach($categories as $category)
+                  <option value="{{ $category->id }}" {{ old('category_id') == $category->id ? 'selected' : '' }}>
+                    {{ $category->name }}
+                  </option>
+                @endforeach
+              </select>
+            </div>
+          </div>
+        </div>
+
+        {{-- RIGHT: Image Product (chỉ 1 ảnh) --}}
+        <div class="col-lg-5">
+          <div class="ui-section p-3 p-md-4 h-100 d-flex flex-column">
+            <h5 class="fw-bold mb-1">Image Product</h5>
+            <div class="hint mb-3"><strong>Note :</strong> SVG, PNG hoặc JPG (tối đa 4MB)</div>
+
+            <label class="w-100">
+              <input type="file" name="image" class="d-none" accept="image/*"
+                     onchange="previewSingle(this)">
+              <div id="dropArea" class="drop w-100">
+                <i class="fa-regular fa-image fa-2xl mb-1"></i>
+                <span id="dropText">Photo</span>
+                <img id="previewImg" class="d-none rounded" style="max-height:160px" alt="preview">
+              </div>
+            </label>
+
+            <div class="mt-auto d-flex justify-content-between pt-4">
+              <a href="{{ route('admin.products.index') }}" class="btn btn-light btn-pill px-4">Cancel</a>
+              <button type="submit" class="btn btn-primary btn-pill px-4">Save Product</button>
+            </div>
+          </div>
+        </div>
+      </div> {{-- row --}}
+    </div>
+  </form>
 </div>
 
-{{-- Script preview ảnh --}}
 <script>
-    function previewImage(event) {
-        const preview = document.getElementById('preview');
-        preview.src = URL.createObjectURL(event.target.files[0]);
-        preview.classList.remove('d-none');
-        preview.onload = () => URL.revokeObjectURL(preview.src);
-    }
+  function previewSingle(input){
+    const file = input.files && input.files[0];
+    if(!file) return;
+    const img = document.getElementById('previewImg');
+    const txt = document.getElementById('dropText');
+    const url = URL.createObjectURL(file);
+    img.src = url;
+    img.classList.remove('d-none');
+    txt.classList.add('d-none');
+    img.onload = () => URL.revokeObjectURL(url);
+  }
 </script>
 @endsection
