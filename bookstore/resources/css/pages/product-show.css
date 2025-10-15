@@ -1,0 +1,27 @@
+/* Chỉ áp dụng cho trang show sản phẩm */
+.product-show {
+
+  /* Bảng gọn gàng, không dính dòng giữa */
+  .table th,
+  .table td {
+    vertical-align: top;
+  }
+
+  /* Ô mô tả: giữ xuống dòng, bẻ chuỗi dài để không tràn viền */
+  .desc {
+    white-space: pre-line;       /* giữ \n */
+    overflow-wrap: anywhere;     /* bẻ từ nếu quá dài */
+    word-break: break-word;      /* fallback cho trình duyệt cũ */
+  }
+
+  /* Ảnh xem chi tiết an toàn khung */
+  .product-image {
+    max-height: 300px;
+    object-fit: contain;
+  }
+
+  /* Card mượt hơn */
+  .card {
+    border-radius: 16px;
+  }
+}

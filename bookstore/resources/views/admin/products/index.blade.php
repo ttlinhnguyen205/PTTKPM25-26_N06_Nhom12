@@ -14,16 +14,34 @@
   <div class="card shadow-sm p-3">
     <div class="d-flex justify-content-between align-items-center mb-3">
       <h4 class="fw-bold">Books</h4>
-      <div>
-        <button class="btn btn-outline-secondary me-2">Filter</button>
-        <button class="btn btn-outline-secondary me-2">Export</button>
+      <div class="d-flex gap-2">
+        <a href="{{ route('admin.products.index') }}" class="btn btn-outline-secondary">Reset</a>
         <a href="{{ route('admin.products.create') }}" class="btn btn-primary">+ Thêm sách mới</a>
       </div>
     </div>
 
-    <form method="GET" action="{{ route('admin.products.index') }}" class="mb-3">
-      <input type="text" name="q" value="{{ request('q') }}" 
-             class="form-control" placeholder="Search by id, name, author or publisher">
+    {{-- FORM FILTER: Search + Sort (có ID ↑ / ID ↓) --}}
+    <form method="GET" action="{{ route('admin.products.index') }}" class="mb-3" id="filterForm">
+      <div class="row g-2 align-items-center">
+        <div class="col-md-6">
+          <input type="text" name="q" value="{{ request('q') }}" 
+                class="form-control" placeholder="Search by id, name, author or publisher">
+        </div>
+
+        <div class="col-md-3">
+          <select name="sort" class="form-select" id="sortSelect">
+            @php $sort = request('sort','latest'); @endphp
+            <option value="latest"   {{ $sort=='latest' ? 'selected' : '' }}>Mới nhất</option>
+            <option value="oldest"   {{ $sort=='oldest' ? 'selected' : '' }}>Cũ nhất</option>
+            <option value="id_asc"   {{ $sort=='id_asc' ? 'selected' : '' }}>ID ↑ </option>
+            <option value="id_desc"  {{ $sort=='id_desc' ? 'selected' : '' }}>ID ↓</option>
+            <option value="price_asc"  {{ $sort=='price_asc' ? 'selected' : '' }}>Giá ↑</option>
+            <option value="price_desc" {{ $sort=='price_desc' ? 'selected' : '' }}>Giá ↓</option>
+            <option value="qty_asc"    {{ $sort=='qty_asc' ? 'selected' : '' }}>Tồn kho ↑</option>
+            <option value="qty_desc"   {{ $sort=='qty_desc' ? 'selected' : '' }}>Tồn kho ↓</option>
+          </select>
+        </div>
+      </div>
     </form>
 
     <div class="table-responsive">

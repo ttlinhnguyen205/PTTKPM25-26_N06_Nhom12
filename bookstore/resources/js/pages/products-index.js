@@ -9,3 +9,12 @@ if (master) {
       .forEach(cb => cb.checked = this.checked);
   });
 }
+
+document.addEventListener('DOMContentLoaded', () => {
+  const sortSelect = document.getElementById('sortSelect');
+  const form = document.getElementById('filterForm');
+  if (sortSelect && form) {
+    sortSelect.addEventListener('change', () => form.submit());
+  }
+});
+
