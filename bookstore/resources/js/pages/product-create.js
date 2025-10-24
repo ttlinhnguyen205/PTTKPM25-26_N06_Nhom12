@@ -1,6 +1,5 @@
 import '../../css/pages/product-form.css'; 
 
-// preview ảnh
 window.previewSingle = function(input){
   const file = input.files && input.files[0];
   if(!file) return;

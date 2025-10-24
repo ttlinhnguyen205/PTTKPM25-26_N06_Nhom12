@@ -9,7 +9,6 @@
   <div class="container-fluid px-3 px-md-4">
     <h4 class="fw-bold mb-3">Cập nhật sản phẩm</h4>
 
-    {{-- Thông báo thành công (nếu có) --}}
     @if (session('success'))
       <div class="alert alert-success alert-dismissible fade show" role="alert">
         <i class="fa-solid fa-circle-check me-2"></i>{{ session('success') }}
@@ -17,7 +16,6 @@
       </div>
     @endif
 
-    {{-- Hiển thị lỗi --}}
     @if ($errors->any())
       <div class="alert alert-danger">
         <ul class="mb-0">
@@ -34,7 +32,6 @@
 
       <div class="ui-card p-3 p-md-4">
         <div class="row g-4">
-          {{-- LEFT COLUMN --}}
           <div class="col-lg-7">
             <div class="ui-section p-3 p-md-4 h-100">
               <h5 class="fw-bold mb-1">Product Information</h5>
@@ -49,7 +46,6 @@
               <div class="row g-3">
                 <div class="col-md-6">
                   <label class="lbl d-block">Giá</label>
-                  {{-- hiển thị tiền Việt: ₫ + phân tách nghìn --}}
                   <div class="input-group">
                     <span class="input-group-text">₫</span>
                     <input
@@ -61,7 +57,6 @@
                       value="{{ old('price', (int) $product->price) }}"
                       autocomplete="off">
                   </div>
-                  {{-- giá trị số thực sự submit về server --}}
                   <input type="hidden" id="price" name="price" value="{{ old('price', $product->price) }}">
                 </div>
 
@@ -117,7 +112,6 @@
             </div>
           </div>
 
-          {{-- RIGHT COLUMN --}}
           <div class="col-lg-5">
             <div class="ui-section p-3 p-md-4 h-100 d-flex flex-column">
               <h5 class="fw-bold mb-1">Image Product</h5>

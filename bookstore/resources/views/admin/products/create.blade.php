@@ -7,7 +7,6 @@
 
 <div class="product-form">
   <div class="container-fluid px-3 px-md-4">
-    {{-- Errors --}}
     @if ($errors->any())
       <div class="alert alert-danger">
         <ul class="mb-0">
@@ -21,7 +20,6 @@
 
       <div class="ui-card p-3 p-md-4">
         <div class="row g-4">
-          {{-- LEFT: Product Information --}}
           <div class="col-lg-7">
             <div class="ui-section p-3 p-md-4 h-100">
               <h5 class="fw-bold mb-1">Product Information</h5>
@@ -89,7 +87,6 @@
             </div>
           </div>
 
-          {{-- RIGHT: Image Product --}}
           <div class="col-lg-5">
             <div class="ui-section p-3 p-md-4 h-100 d-flex flex-column">
               <h5 class="fw-bold mb-1">Image Product</h5>
@@ -110,12 +107,11 @@
               </div>
             </div>
           </div>
-        </div> {{-- row --}}
+        </div> 
       </div>
     </form>
   </div>
 </div>
 
-{{-- Entry Vite riêng cho trang create --}}
 @vite('resources/js/pages/product-create.js')
 @endsection

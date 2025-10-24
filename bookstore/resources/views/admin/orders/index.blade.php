@@ -9,7 +9,6 @@
     $statusParam = request('status');
     $q = request('q');
 
-    // Nếu controller có truyền $counts thì dùng, không thì fallback
     $counts = $counts ?? [
         'all'        => $orders->total(),
         'shipping'   => $shippingCount ?? 0,
@@ -29,20 +28,9 @@
     }
 @endphp
 
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
-
-<style>
-  .card-ui{border:1px solid #e5e7eb;border-radius:16px;background:#fff}
-  .tabs-wrap{border:1px solid #e5e7eb;border-radius:12px;padding:6px;background:#fff}
-  .tab-btn{border-radius:999px;padding:.45rem .9rem;font-weight:600;border:0;background:transparent;color:#6b7280}
-  .tab-active{background:#e7f0ff;color:#2563eb}
-  .table-rounded thead th{background:#f8fafc;color:#6b7280;font-weight:600}
-  .thumb{width:36px;height:36px;border-radius:6px;object-fit:cover;background:#f3f4f6}
-  .icon-btn{display:inline-flex;align-items:center;justify-content:center;width:30px;height:30px;border-radius:999px;border:1px solid #e5e7eb;background:#fff}
-  .icon-btn:hover{background:#f9fafb}
-  .search-input{border-radius:12px;padding:.6rem .9rem .6rem 2.2rem;border:1px solid #e5e7eb}
-  .search-ico{position:absolute;left:.8rem;top:50%;transform:translateY(-50%);color:#9ca3af}
-</style>
+@push('styles')
+  @vite(['resources/css/pages/orders-index.css'])
+@endpush
 
 <div class="container-fluid px-3 px-md-4">
   @if(session('success'))
@@ -110,7 +98,6 @@
         <tbody>
           @forelse($orders as $order)
             @php
-                // Lấy sản phẩm đầu tiên trong đơn (nếu có) để hiển thị ảnh + tên
                 $firstDetail = $order->orderDetails->first() ?? null;
                 $product = $firstDetail?->product;
                 $thumb = '';
@@ -119,7 +106,6 @@
                             ? $product->image
                             : 'images/book/' . ltrim($product->image, '/'));
                 }
-                // Payment: nếu có field payment_status thì dùng; nếu không, suy luận theo status
                 $payment = $order->payment_status ?? ($order->status === 'completed' ? 'paid' : 'unpaid');
                 $paymentClass = $payment === 'paid' ? 'badge bg-success-subtle text-success' : 'badge bg-warning-subtle text-warning';
                 $statusClass  = statusBadge($order->status);
@@ -127,7 +113,6 @@
             <tr>
               <td><input type="checkbox" name="ids[]" value="{{ $order->id }}"></td>
 
-              {{-- Orders (thumb + id link + product name) --}}
               <td>
                 <div class="d-flex align-items-center">
                   @if($thumb)
@@ -174,7 +159,7 @@
       </table>
     </div>
 
-    {{-- Footer: pagination + page size --}}
+    {{-- Footer --}}
     <div class="d-flex justify-content-between align-items-center mt-2">
       <div class="text-muted small">
         {{ $orders->firstItem() ?? 0 }} - {{ $orders->lastItem() ?? 0 }} of {{ $orders->total() ?? $orders->count() }} Pages
@@ -201,10 +186,7 @@
   </div>
 </div>
 
-<script>
-  const ca = document.getElementById('checkAll');
-  if (ca) ca.addEventListener('change', function(){
-    document.querySelectorAll('input[name="ids[]"]').forEach(cb => cb.checked = this.checked);
-  });
-</script>
+@push('scripts')
+@vite(['resources/js/pages/orders-index.js'])
+@endpush
 @endsection

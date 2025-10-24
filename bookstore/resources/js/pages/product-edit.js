@@ -1,6 +1,5 @@
 import '../../css/pages/product-form.css';
 
-// code xử lý giá + preview ảnh
 const nfVN = new Intl.NumberFormat('vi-VN');
 const priceDisplay = document.getElementById('price_display');
 const priceHidden  = document.getElementById('price');
@@ -27,7 +26,6 @@ if (priceDisplay && priceHidden) {
   });
 }
 
-// preview ảnh
 window.previewSingle = function(input){
   const file = input.files && input.files[0];
   if(!file) return;

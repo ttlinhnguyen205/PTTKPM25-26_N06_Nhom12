@@ -9,7 +9,7 @@
 <body>
 <x-app-layout>
 <div class="container py-4">
-    <h2 class="mb-4">🧾 Lịch sử mua sách của bạn</h2>
+    <h2 class="mb-4">Lịch sử mua sách của bạn</h2>
 
     @forelse ($orders as $order)
         <div class="card mb-4 shadow-sm border-0">

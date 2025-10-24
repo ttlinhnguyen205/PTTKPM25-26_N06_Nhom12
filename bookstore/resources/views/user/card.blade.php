@@ -9,7 +9,7 @@
 <body>
 <x-app-layout>
 <div class="container mt-5">
-    <h2 class="mb-4 text-primary">🛒 GIỎ HÀNG ({{ count($cartItems) }} sản phẩm)</h2>
+    <h2 class="mb-4 text-primary">GIỎ HÀNG ({{ count($cartItems) }} sản phẩm)</h2>
 
     @if ($cartItems->isEmpty())
         <div class="alert alert-info">Chưa có sách nào trong giỏ hàng.</div>

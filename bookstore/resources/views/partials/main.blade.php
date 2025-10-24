@@ -6,6 +6,7 @@
                 <div class="col-12 col-xl-8 mb-4 mb-xl-0">
                   <h3 class="font-weight-bold">Welcome Readora</h3>
                   <h6 class="font-weight-normal mb-0">All systems are running smoothly!</span></h6>
+
                 </div>
                 <div class="col-12 col-xl-4">
                  <div class="justify-content-end d-flex">
@@ -89,42 +90,161 @@
           <div class="row">
             <div class="col-md-6 grid-margin stretch-card">
               <div class="card">
+
+
                 <div class="card-body">
                   <p class="card-title">Order Details</p>
-                  <p class="font-weight-500">The total number of sessions within the date range. It is the period time a user is actively engaged with your website, page or app, etc</p>
-                  <div class="d-flex flex-wrap mb-5">
-                    <div class="mr-5 mt-3">
-                      <p class="text-muted">Order value</p>
-                      <h3 class="text-primary fs-30 font-weight-medium">12.3k</h3>
-                    </div>
-                    <div class="mr-5 mt-3">
-                      <p class="text-muted">Orders</p>
-                      <h3 class="text-primary fs-30 font-weight-medium">14k</h3>
-                    </div>
-                    <div class="mr-5 mt-3">
-                      <p class="text-muted">Users</p>
-                      <h3 class="text-primary fs-30 font-weight-medium">71.56%</h3>
-                    </div>
-                    <div class="mt-3">
-                      <p class="text-muted">Downloads</p>
-                      <h3 class="text-primary fs-30 font-weight-medium">34040</h3>
-                    </div> 
+                  <p class="font-weight-500 mb-4">Revenue overview by month in {{ $year }}.</p>
+
+                  <div class="text-center mb-3">
+                    <h4 class="font-weight-bold text-primary">
+                      Total Revenue: {{ number_format($totalYear, 0, ',', '.') }} ₫
+                    </h4>
                   </div>
-                  <canvas id="order-chart"></canvas>
+
+                  {{-- Canvas biểu đồ --}}
+                  <canvas id="order-chart" height="150"></canvas>
                 </div>
+
+                {{-- SCRIPT ORDER DETAILS --}}
+                @push('scripts')
+                <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+                <script>
+                document.addEventListener('DOMContentLoaded', function () {
+                  const months = {!! json_encode($months) !!};
+                  const totals = {!! json_encode($totals) !!};
+
+                  if (!months.length || !totals.length) return;
+
+                  const monthLabels = months.map(m => {
+                    const d = new Date();
+                    d.setMonth(m - 1);
+                    return d.toLocaleString('en', { month: 'short' });
+                  });
+
+                  const orderCanvas = document.getElementById('order-chart');
+                  if (orderCanvas) {
+                    new Chart(orderCanvas, {
+                      type: 'bar',
+                      data: {
+                        labels: monthLabels,
+                        datasets: [{
+                          label: 'Revenue (₫)',
+                          data: totals,
+                          backgroundColor: 'rgba(54, 162, 235, 0.6)',
+                          borderColor: 'rgba(54, 162, 235, 1)',
+                          borderWidth: 1,
+                          borderRadius: 5
+                        }]
+                      },
+                      options: {
+                        responsive: true,
+                        plugins: {
+                          legend: { display: false },
+                          title: {
+                            display: true,
+                            text: 'Monthly Revenue Overview',
+                            font: { size: 16, weight: 'bold' }
+                          },
+                          tooltip: {
+                            callbacks: {
+                              label: ctx => `Revenue: ${ctx.formattedValue} ₫`
+                            }
+                          }
+                        },
+                        scales: {
+                          x: { title: { display: true, text: 'Month' } },
+                          y: { beginAtZero: true, title: { display: true, text: 'Revenue (₫)' } }
+                        }
+                      }
+                    });
+                  }
+                });
+                </script>
+                @endpush
+
               </div>
             </div>
             <div class="col-md-6 grid-margin stretch-card">
               <div class="card">
                 <div class="card-body">
-                 <div class="d-flex justify-content-between">
-                  <p class="card-title">Sales Report</p>
-                  <a href="#" class="text-info">View all</a>
-                 </div>
-                  <p class="font-weight-500">The total number of sessions within the date range. It is the period time a user is actively engaged with your website, page or app, etc</p>
-                  <div id="sales-legend" class="chartjs-legend mt-4 mb-2"></div>
-                  <canvas id="sales-chart"></canvas>
+                  <div class="d-flex justify-content-between align-items-center mb-2">
+                    <p class="card-title">Sales Report</p>
+                    <a href="#" class="text-info small">View details</a>
+                  </div>
+                  <p class="font-weight-500">Monthly revenue trend for {{ $year }} — visualized as a line chart.</p>
+
+                  <div class="text-center mb-3">
+                    <h4 class="font-weight-bold text-success">
+                      Total: {{ number_format($totalYear, 0, ',', '.') }} ₫
+                    </h4>
+                  </div>
+
+                  <canvas id="sales-chart" height="150"></canvas>
                 </div>
+
+                {{-- SCRIPT SALES REPORT --}}
+                @push('scripts')
+                <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+                <script>
+                document.addEventListener('DOMContentLoaded', function () {
+                  const months = {!! json_encode($months) !!};
+                  const totals = {!! json_encode($totals) !!};
+
+                  if (!months.length || !totals.length) return;
+
+                  const monthLabels = months.map(m => {
+                    const d = new Date();
+                    d.setMonth(m - 1);
+                    return d.toLocaleString('en', { month: 'short' });
+                  });
+
+                  const salesCanvas = document.getElementById('sales-chart');
+                  if (salesCanvas) {
+                    new Chart(salesCanvas, {
+                      type: 'line',
+                      data: {
+                        labels: monthLabels,
+                        datasets: [{
+                          label: 'Sales (₫)',
+                          data: totals,
+                          fill: true,
+                          borderColor: 'rgba(75, 192, 192, 1)',
+                          backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                          tension: 0.4,
+                          borderWidth: 2,
+                          pointBackgroundColor: '#fff',
+                          pointBorderColor: 'rgba(75, 192, 192, 1)',
+                          pointRadius: 5,
+                          pointHoverRadius: 7
+                        }]
+                      },
+                      options: {
+                        responsive: true,
+                        plugins: {
+                          legend: { display: true, position: 'top' },
+                          title: {
+                            display: true,
+                            text: 'Sales Trend — ' + {{ $year }},
+                            font: { size: 15, weight: 'bold' }
+                          },
+                          tooltip: {
+                            callbacks: {
+                              label: ctx => `Sales: ${ctx.formattedValue} ₫`
+                            }
+                          }
+                        },
+                        scales: {
+                          x: { title: { display: true, text: 'Month' } },
+                          y: { beginAtZero: true, title: { display: true, text: 'Sales (₫)' } }
+                        }
+                      }
+                    });
+                  }
+                });
+                </script>
+                @endpush
+
               </div>
             </div>
           </div>

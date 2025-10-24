@@ -13,6 +13,7 @@ use App\Http\Controllers\Admin\AdminController;
 use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\OrderController;
 use App\Http\Controllers\Admin\ProductController as AdminProductController;
+use App\Http\Controllers\Admin\RevenueController;
 
 use App\Http\Controllers\AddressController;
 use App\Http\Controllers\OrderDetailController;
@@ -80,5 +81,5 @@ Route::middleware(['auth', 'adminMiddleware'])
         Route::resource('categories', \App\Http\Controllers\Admin\CategoryController::class);
         Route::resource('products', AdminProductController::class);
         Route::resource('orders', \App\Http\Controllers\Admin\OrderController::class);
-
+        Route::get('/revenue', [RevenueController::class, 'index'])->name('revenue');
     });

@@ -9,7 +9,6 @@
     <div class="card shadow-sm border-0">
         <div class="card-body">
             <div class="row">
-                {{-- Ảnh sản phẩm --}}
                 <div class="col-md-4 text-center mb-3">
                     @if($product->image)
                         <img src="{{ asset($product->image) }}" 
@@ -23,7 +22,6 @@
                     @endif
                 </div>
 
-                {{-- Thông tin sản phẩm --}}
                 <div class="col-md-8">
                     <div class="table-responsive">
                         <table class="table table-bordered align-middle mb-0">
@@ -64,7 +62,6 @@
 
                                 <tr>
                                     <th>Mô tả</th>
-                                    {{-- Dùng nl2br(e()) để giữ xuống dòng và an toàn XSS --}}
                                     <td class="desc">{!! nl2br(e($product->description ?: '—')) !!}</td>
                                 </tr>
 
@@ -98,7 +95,6 @@
                 </div>
             </div>
 
-            {{-- Nút hành động --}}
             <div class="mt-3 d-flex justify-content-between">
                 <a href="{{ route('admin.products.index') }}" class="btn btn-outline-secondary">
                     <i class="fa-solid fa-arrow-left me-1"></i> Quay lại
@@ -111,6 +107,5 @@
     </div>
 </div>
 
-{{-- Entry Vite riêng cho trang show (kéo CSS/JS của trang) --}}
 @vite('resources/js/pages/product-show.js')
 @endsection
