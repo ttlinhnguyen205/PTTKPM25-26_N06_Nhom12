@@ -1,7 +1,7 @@
 <?php
 
 namespace App\Http\Controllers\User;
-
+use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Product;
@@ -16,4 +16,5 @@ class UserController extends Controller
         // Truyền sang view user.dashboard
         return view('user.dashboard', compact('products'));
     }
+
 }

@@ -4,44 +4,52 @@ namespace App\Http\Controllers\User;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use App\Models\Cart;
 use App\Models\Product;
-use Illuminate\Support\Facades\Session;
 
 class CartController extends Controller
 {
+    // Hiển thị giỏ hàng
     public function index()
     {
-        $cart = Session::get('cart', []);
-        return view('user.cart.index', compact('cart'));
+        $user = Auth::user();
+        $cartItems = Cart::with('product')
+                        ->where('user_id', $user->id)
+                        ->get();
+
+        $total = $cartItems->sum(function ($item) {
+            return $item->product->price * $item->quantity;
+        });
+
+        return view('user.cart.index', compact('cartItems', 'total'));
     }
 
-    public function add($id)
+    // Thêm sản phẩm vào giỏ
+    public function add(Request $request, $id)
     {
+        $user = Auth::user();
         $product = Product::findOrFail($id);
 
-        $cart = Session::get('cart', []);
-        $cart[$id] = [
-            'id' => $product->id,
-            'name' => $product->name,
-            'price' => $product->price,
-            'quantity' => ($cart[$id]['quantity'] ?? 0) + 1,
-            'image' => $product->image,
-        ];
+        $cartItem = Cart::firstOrCreate(
+            ['user_id' => $user->id, 'product_id' => $id],
+            ['quantity' => 0]
+        );
 
-        Session::put('cart', $cart);
+        $cartItem->quantity += $request->input('quantity', 1);
+        $cartItem->save();
 
-        return redirect()->back()->with('success', 'Đã thêm vào giỏ hàng!');
+        return redirect()->back()->with('success', 'Added to cart!');
     }
 
+    // Xóa khỏi giỏ hàng
     public function remove($id)
     {
-        $cart = Session::get('cart', []);
+        $user = Auth::user();
+        Cart::where('user_id', $user->id)
+            ->where('id', $id)
+            ->delete();
 
-        if (isset($cart[$id])) {
-            unset($cart[$id]);
-            Session::put('cart', $cart);
-        }
-
-        return redirect()->back()->with('success', 'Đã xóa sản phẩm khỏi giỏ!');
+        return redirect()->back()->with('success', 'Item removed from cart.');
     }
 }

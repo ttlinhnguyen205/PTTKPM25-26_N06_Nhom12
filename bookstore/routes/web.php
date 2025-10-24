@@ -59,6 +59,10 @@ Route::middleware(['auth', 'userMiddleware'])
         Route::resource('categories', CategoryController::class);
         Route::get('/products/{id}', [UserProductController::class, 'show'])->name('products.show');
 
+        // ✅ Orders
+        Route::get('/orders', [UserController::class, 'orders'])->name('orders.index');
+        Route::get('/orders/{id}', [UserController::class, 'showOrder'])->name('orders.show');
+
         // Cart
         Route::post('/cart/{id}', [CartController::class, 'add'])->name('cart.add');
         Route::delete('/cart/{id}', [CartController::class, 'remove'])->name('cart.remove');
