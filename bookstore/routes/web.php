@@ -8,6 +8,7 @@ use App\Http\Controllers\User\UserController;
 use App\Http\Controllers\User\CartController;
 use App\Http\Controllers\User\CheckoutController;
 use App\Http\Controllers\User\ProductController as UserProductController;
+use App\Http\Controllers\User\DashboardController;
 
 use App\Http\Controllers\Admin\AdminController;
 use App\Http\Controllers\Admin\CategoryController;
@@ -54,11 +55,12 @@ Route::middleware(['auth', 'userMiddleware'])
     ->name('user.')
     ->group(function () {
         Route::get('/dashboard', [UserController::class, 'index'])->name('dashboard');
+        Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
         // Browsing & shopping
         Route::resource('categories', CategoryController::class);
         Route::get('/products/{id}', [UserProductController::class, 'show'])->name('products.show');
-
+        
         // ✅ Orders
         Route::get('/orders', [UserController::class, 'orders'])->name('orders.index');
         Route::get('/orders/{id}', [UserController::class, 'showOrder'])->name('orders.show');
