@@ -5,11 +5,45 @@ namespace App\Http\Controllers\User;
 use App\Http\Controllers\Controller;
 use App\Models\Product;
 use App\Models\Category;
+use Illuminate\Http\Request;
 
 class ProductController extends Controller
 {
     /**
-     * Hiển thị trang chi tiết sản phẩm.
+     * Trang danh sách sản phẩm (Shop Page)
+     */
+    public function index(Request $request)
+    {
+        $query = Product::query();
+
+        // ====== Lọc theo danh mục ======
+        if ($categoryId = $request->input('category')) {
+            $query->where('category_id', $categoryId);
+        }
+
+        // ====== Sắp xếp ======
+        switch ($request->input('sort')) {
+            case 'price_asc':
+                $query->orderBy('price', 'asc');
+                break;
+            case 'price_desc':
+                $query->orderBy('price', 'desc');
+                break;
+            default:
+                $query->orderBy('created_at', 'desc');
+                break;
+        }
+
+        // ====== Lấy dữ liệu ======
+        $products = $query->paginate(12)->withQueryString();
+        $categories = Category::orderBy('name')->get();
+
+        // Trả về view chính xác
+        return view('user.products.index', compact('products', 'categories'));
+    }
+
+    /**
+     * Trang chi tiết sản phẩm
      */
     public function show($id)
     {
@@ -22,18 +56,6 @@ class ProductController extends Controller
                             ->take(4)
                             ->get();
 
-        // Trả dữ liệu sang view
-        return view('user.detail', compact('book', 'relatedBooks'));
-    }
-
-    /**
-     * Hiển thị danh sách tất cả sản phẩm (nếu bạn cần trang Shop).
-     */
-    public function index()
-    {
-        $products = Product::latest()->paginate(12);
-        $categories = Category::orderBy('name')->get();
-
-        return view('user.shop', compact('products', 'categories'));
+        return view('user.products.show', compact('book', 'relatedBooks'));
     }
 }

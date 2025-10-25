@@ -27,8 +27,8 @@ Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+    Route::post('/profile/change-password', [ProfileController::class, 'changePassword'])->name('profile.password');
 });
-
 require __DIR__ . '/auth.php';
 
 Route::get('/dashboard', function (Request $request) {
@@ -57,23 +57,27 @@ Route::middleware(['auth', 'userMiddleware'])
         Route::get('/dashboard', [UserController::class, 'index'])->name('dashboard');
         Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
-        // Browsing & shopping
         Route::resource('categories', CategoryController::class);
+        Route::get('/products', [UserProductController::class, 'index'])->name('products.index');
+
+        // Trang chi tiết sản phẩm
         Route::get('/products/{id}', [UserProductController::class, 'show'])->name('products.show');
         
-        // ✅ Orders
+        // Orders
         Route::get('/orders', [UserController::class, 'orders'])->name('orders.index');
         Route::get('/orders/{id}', [UserController::class, 'showOrder'])->name('orders.show');
 
         // Cart
-        Route::post('/cart/{id}', [CartController::class, 'add'])->name('cart.add');
-        Route::delete('/cart/{id}', [CartController::class, 'remove'])->name('cart.remove');
         Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
+        Route::post('/cart/{id}', [CartController::class, 'add'])->name('cart.add');
+        Route::put('/cart/{id}/update', [CartController::class, 'update'])->name('cart.update');
+        Route::delete('/cart/{id}', [CartController::class, 'remove'])->name('cart.remove');
 
         // Checkout
         Route::get('/checkout/{id}', [CheckoutController::class, 'show'])->name('checkout.show');
         Route::post('/checkout/{id}', [CheckoutController::class, 'process'])->name('checkout.process');
     });
+
 
 // Admin route 
 Route::middleware(['auth', 'adminMiddleware'])

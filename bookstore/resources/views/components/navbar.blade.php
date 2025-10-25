@@ -4,14 +4,14 @@
     <div class="container navbar-top">
       <!-- Logo -->
       <div class="logo">
-        <a href="/">
+        <a href="{{ route('user.dashboard') }}">
           <img src="{{ asset('images/logo6.png') }}" alt="Readora Logo">
         </a>
       </div>
 
       <!-- Search bar -->
       <div class="search-bar">
-        <form action="{{ route('user.dashboard') }}" method="GET">
+        <form action="{{ route('user.products.index') }}" method="GET">
           <input type="text" name="q" placeholder="Search Books..." class="search-input">
           <button type="submit"><i class="fa-solid fa-magnifying-glass"></i></button>
         </form>
@@ -43,15 +43,23 @@
           @csrf
         </form>
       </div>
-    </div> <!-- ✅ ĐÓNG top-bar ở đây -->
+    </div>
   </div>
 
   <!-- ======= BOTTOM NAVBAR ======= -->
   <div class="bottom-bar">
     <div class="container">
       <ul class="menu">
-        <li><a href="{{ route('user.dashboard') }}" class="active">HOME</a></li>
-        <li><a href="#shop">PRODUCT</a></li>
+        <li>
+          <a href="{{ route('user.dashboard') }}" class="{{ request()->routeIs('user.dashboard') ? 'active' : '' }}">
+            HOME
+          </a>
+        </li>
+        <li>
+          <a href="{{ route('user.products.index') }}" class="{{ request()->routeIs('user.products.*') ? 'active' : '' }}">
+            PRODUCT
+          </a>
+        </li>
         <li><a href="#">AUTHOR</a></li>
         <li><a href="#">PUBLISHER</a></li>
         <li><a href="#">CONTACT US</a></li>
