@@ -12,7 +12,7 @@ class Order extends Model
     protected $table = 'orders'; // 👈 thêm rõ để tránh nhầm nếu table có tiền tố
 
     protected $fillable = [
-        'date',
+        'order_date',
         'status',
         'total_money',
         'customer_id',
@@ -20,7 +20,7 @@ class Order extends Model
     ];
 
     protected $casts = [
-        'date' => 'datetime',
+        'order_date' => 'datetime',
         'total_money' => 'decimal:2',
     ];
 

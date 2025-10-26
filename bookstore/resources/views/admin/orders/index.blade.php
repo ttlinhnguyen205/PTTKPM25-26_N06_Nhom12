@@ -33,66 +33,69 @@
 @endpush
 
 <div class="container-fluid px-3 px-md-4">
+  {{-- ==== THÔNG BÁO ==== --}}
   @if(session('success'))
     <div class="alert alert-success">{{ session('success') }}</div>
   @endif
 
   <div class="card-ui p-3 p-md-4">
-    {{-- Top actions --}}
+
+    {{-- ==== THANH CÔNG CỤ ==== --}}
     <div class="d-flex flex-wrap gap-2 justify-content-between align-items-center mb-3">
       <form method="GET" action="{{ route('admin.orders.index') }}" class="flex-grow-1 me-2" style="max-width:520px;">
         <div class="position-relative">
           <i class="fa-solid fa-magnifying-glass search-ico"></i>
           <input type="text" name="q" value="{{ $q }}" class="form-control search-input"
-                 placeholder="Search for id, name product">
+                 placeholder="Tìm kiếm theo ID, tên sản phẩm...">
           @if($statusParam) <input type="hidden" name="status" value="{{ $statusParam }}"> @endif
         </div>
       </form>
 
       <div class="d-flex gap-2">
-        <a class="btn btn-outline-secondary"><i class="fa-solid fa-filter me-1"></i> Filter</a>
-        <a class="btn btn-outline-secondary"><i class="fa-solid fa-file-export me-1"></i> Export</a>
+        <a class="btn btn-outline-secondary"><i class="fa-solid fa-filter me-1"></i> Lọc</a>
+        <a class="btn btn-outline-secondary"><i class="fa-solid fa-file-export me-1"></i> Xuất</a>
         <a href="{{ route('admin.orders.create') }}" class="btn btn-primary">
-          <i class="fa-solid fa-plus me-1"></i> New Order
+          <i class="fa-solid fa-plus me-1"></i> Đơn hàng mới
         </a>
       </div>
     </div>
 
-    {{-- Tabs --}}
+    {{-- ==== TAB TRẠNG THÁI ==== --}}
     <div class="tabs-wrap mb-3">
       <div class="d-flex flex-wrap gap-2">
         <a href="{{ route('admin.orders.index', array_filter(['q'=>$q])) }}"
            class="tab-btn {{ !$statusParam ? 'tab-active' : '' }}">
-          All Orders ({{ $counts['all'] }})
+          Tất cả ({{ $counts['all'] }})
         </a>
         <a href="{{ route('admin.orders.index', array_filter(['status'=>'shipping','q'=>$q])) }}"
            class="tab-btn {{ $statusParam==='shipping' ? 'tab-active' : '' }}">
-          Shipping ({{ $counts['shipping'] }})
+          Đang giao ({{ $counts['shipping'] }})
         </a>
         <a href="{{ route('admin.orders.index', array_filter(['status'=>'completed','q'=>$q])) }}"
            class="tab-btn {{ $statusParam==='completed' ? 'tab-active' : '' }}">
-          Completed ({{ $counts['completed'] }})
+          Hoàn tất ({{ $counts['completed'] }})
         </a>
         <a href="{{ route('admin.orders.index', array_filter(['status'=>'cancelled','q'=>$q])) }}"
            class="tab-btn {{ $statusParam==='cancelled' ? 'tab-active' : '' }}">
-          Cancel ({{ $counts['cancelled'] }})
+          Đã hủy ({{ $counts['cancelled'] }})
         </a>
       </div>
     </div>
 
-    {{-- Table --}}
+    {{-- ==== BẢNG ĐƠN HÀNG ==== --}}
     <div class="table-responsive">
       <table class="table align-middle table-hover table-rounded">
         <thead>
           <tr>
             <th style="width:36px"><input type="checkbox" id="checkAll"></th>
-            <th>Orders</th>
-            <th>Customer</th>
-            <th>Price</th>
-            <th>Date</th>
-            <th>Payment</th>
-            <th>Status</th>
-            <th class="text-end">Action</th>
+            <th>Đơn hàng</th>
+            <th>Khách hàng</th>
+            <th>Sản phẩm</th>
+            <th>Tổng tiền</th>
+            <th>Ngày đặt</th>
+            <th>Thanh toán</th>
+            <th>Trạng thái</th>
+            <th class="text-end">Hành động</th>
           </tr>
         </thead>
         <tbody>
@@ -113,38 +116,65 @@
             <tr>
               <td><input type="checkbox" name="ids[]" value="{{ $order->id }}"></td>
 
+              {{-- Cột thông tin đơn hàng --}}
               <td>
                 <div class="d-flex align-items-center">
                   @if($thumb)
                     <img src="{{ $thumb }}" class="thumb me-2" alt="thumb">
                   @else
-                    <div class="thumb me-2"></div>
+                    <div class="thumb me-2 bg-light"></div>
                   @endif
                   <div>
-                    <a href="{{ route('admin.orders.show', $order->id) }}" class="text-primary small fw-semibold">0{{ $order->id }}</a>
-                    <div class="text-muted">{{ $product->name ?? '—' }}</div>
+                    <a href="{{ route('admin.orders.show', $order->id) }}" class="text-primary small fw-semibold">#{{ $order->id }}</a>
+                    <div class="text-muted small">{{ $product->name ?? '—' }}</div>
                   </div>
                 </div>
               </td>
 
+              {{-- Tên khách hàng --}}
               <td>{{ $order->customer->name ?? 'N/A' }}</td>
-              <td>{{ number_format($order->total_money ?? 0, 0, ',', '.') }} đ</td>
-              <td>{{ \Carbon\Carbon::parse($order->date)->format('m/d/Y') }}</td>
 
+              {{-- Danh sách sản phẩm trong đơn --}}
+              <td>
+                  @if($order->orderDetails->isEmpty())
+                      <span class="text-muted">Không có sản phẩm</span>
+                  @else
+                      <ul class="mb-0 small">
+                          @foreach($order->orderDetails as $detail)
+                              <li>
+                                  {{ $detail->product->name ?? 'SP #' . $detail->product_id }}
+                                  (x{{ $detail->quantity }})
+                                  - {{ number_format($detail->price, 0, ',', '.') }} đ
+                              </li>
+                          @endforeach
+                      </ul>
+                  @endif
+              </td>
+
+              {{-- Tổng tiền --}}
+              <td>{{ number_format($order->total_money ?? 0, 0, ',', '.') }} đ</td>
+
+              {{-- Ngày đặt --}}
+              <td>{{ \Carbon\Carbon::parse($order->order_date)->format('d/m/Y') }}</td>
+
+              {{-- Thanh toán --}}
               <td><span class="{{ $paymentClass }}">{{ Str::title($payment) }}</span></td>
+
+              {{-- Trạng thái --}}
               <td><span class="{{ $statusClass }}">{{ Str::title($order->status) }}</span></td>
 
+              {{-- Hành động --}}
               <td class="text-end">
-                <a href="{{ route('admin.orders.show', $order->id) }}" class="icon-btn me-1" title="View">
+                <a href="{{ route('admin.orders.show', $order->id) }}" class="icon-btn me-1" title="Xem">
                   <i class="fa-regular fa-eye"></i>
                 </a>
-                <a href="{{ route('admin.orders.edit', $order->id) }}" class="icon-btn me-1" title="Edit">
+                <a href="{{ route('admin.orders.edit', $order->id) }}" class="icon-btn me-1" title="Sửa">
                   <i class="fa-regular fa-pen-to-square"></i>
                 </a>
                 <form action="{{ route('admin.orders.destroy', $order->id) }}" method="POST" class="d-inline"
                       onsubmit="return confirm('Xóa đơn hàng này?')">
                   @csrf @method('DELETE')
-                  <button type="submit" class="icon-btn text-danger" title="Delete">
+                  <button type="submit" class="icon-btn text-danger" title="Xóa">
                     <i class="fa-regular fa-trash-can"></i>
                   </button>
                 </form>
@@ -152,30 +182,26 @@
             </tr>
           @empty
             <tr>
-              <td colspan="8" class="text-center text-muted py-4">Chưa có đơn hàng nào</td>
+              <td colspan="9" class="text-center text-muted py-4">Chưa có đơn hàng nào</td>
             </tr>
           @endforelse
         </tbody>
       </table>
     </div>
 
-    {{-- Footer --}}
+    {{-- ==== FOOTER PHÂN TRANG ==== --}}
     <div class="d-flex justify-content-between align-items-center mt-2">
       <div class="text-muted small">
-        {{ $orders->firstItem() ?? 0 }} - {{ $orders->lastItem() ?? 0 }} of {{ $orders->total() ?? $orders->count() }} Pages
+        {{ $orders->firstItem() ?? 0 }} - {{ $orders->lastItem() ?? 0 }} / {{ $orders->total() ?? $orders->count() }} đơn hàng
       </div>
 
       <div class="d-flex align-items-center gap-2">
-        <form method="GET" action="{{ route('admin.orders.index') }}" class="d-flex align-items-center">
-          @if($statusParam) <input type="hidden" name="status" value="{{ $statusParam }}"> @endif
-          @if($q) <input type="hidden" name="q" value="{{ $q }}"> @endif
-          <label class="me-1 small text-muted">The page on</label>
-        </form>
         <div class="ms-2">
           {{ $orders->appends(request()->query())->links('pagination::bootstrap-5') }}
         </div>
       </div>
     </div>
+
   </div>
 </div>
 
