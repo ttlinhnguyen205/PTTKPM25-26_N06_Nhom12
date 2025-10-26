@@ -128,7 +128,7 @@
               </td>
 
               <td>{{ $order->customer->name ?? 'N/A' }}</td>
-              <td>${{ number_format($order->total_money ?? 0, 2) }}</td>
+              <td>{{ number_format($order->total_money ?? 0, 0, ',', '.') }} đ</td>
               <td>{{ \Carbon\Carbon::parse($order->date)->format('m/d/Y') }}</td>
 
               <td><span class="{{ $paymentClass }}">{{ Str::title($payment) }}</span></td>
@@ -170,13 +170,6 @@
           @if($statusParam) <input type="hidden" name="status" value="{{ $statusParam }}"> @endif
           @if($q) <input type="hidden" name="q" value="{{ $q }}"> @endif
           <label class="me-1 small text-muted">The page on</label>
-          <select name="page_size" class="form-select form-select-sm" onchange="this.form.submit()">
-            @foreach([9, 15, 30] as $size)
-              <option value="{{ $size }}" {{ (int)request('page_size', 9) === $size ? 'selected' : '' }}>
-                {{ $size }}
-              </option>
-            @endforeach
-          </select>
         </form>
         <div class="ms-2">
           {{ $orders->appends(request()->query())->links('pagination::bootstrap-5') }}
