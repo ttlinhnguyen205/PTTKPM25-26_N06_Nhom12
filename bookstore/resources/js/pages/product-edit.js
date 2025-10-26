@@ -4,14 +4,17 @@ const nfVN = new Intl.NumberFormat('vi-VN');
 const priceDisplay = document.getElementById('price_display');
 const priceHidden  = document.getElementById('price');
 
+// Giữ nguyên hàm digitsOnly cho xử lý input, KHÔNG dùng để đọc giá ban đầu
 function digitsOnly(s){ return (s || '').toString().replace(/[^\d]/g, ''); }
 
 if (priceDisplay && priceHidden) {
   (function initPrice(){
-    const val = digitsOnly(priceHidden.value);
-    priceDisplay.value = val ? nfVN.format(parseInt(val, 10)) : '';
+    // 👇 Đổi đoạn này: không dùng digitsOnly vì nó xoá dấu thập phân
+    const val = parseFloat(priceHidden.value.replace(',', '.')); 
+    priceDisplay.value = val ? nfVN.format(Math.round(val)) : '';
   })();
 
+  // Khi người dùng nhập, vẫn dùng digitsOnly để format lại
   priceDisplay.addEventListener('input', function(){
     const raw = digitsOnly(this.value);
     if(!raw){ this.value = ''; priceHidden.value = ''; return; }

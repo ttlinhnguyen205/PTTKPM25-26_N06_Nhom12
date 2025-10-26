@@ -78,9 +78,8 @@
                 <div class="col-md-6 stretch-card transparent">
                   <div class="card card-light-danger">
                     <div class="card-body">
-                      <p class="mb-4">Number of Clients</p>
-                      <p class="fs-30 mb-2">47033</p>
-                      <p>0.22% (30 days)</p>
+                      <p class="mb-4">Tổng số khách hàng</p>
+                      <p class="fs-30 mb-2">{{ $totalClients }}</p>
                     </div>
                   </div>
                 </div>
@@ -88,437 +87,157 @@
             </div>
           </div>
           <div class="row">
+            {{-- ===== CỘT TRÁI: ORDER DETAILS ===== --}}
             <div class="col-md-6 grid-margin stretch-card">
               <div class="card">
-
-
                 <div class="card-body">
                   <p class="card-title">Order Details</p>
-                  <p class="font-weight-500 mb-4">Revenue overview by month in {{ $year }}.</p>
+                  <p class="font-weight-500 mb-3">Danh sách 5 đơn hàng gần nhất</p>
 
-                  <div class="text-center mb-3">
-                    <h4 class="font-weight-bold text-primary">
-                      Total Revenue: {{ number_format($totalYear, 0, ',', '.') }} ₫
-                    </h4>
+                  <div class="table-responsive">
+                    <table class="table table-striped table-borderless align-middle">
+                      <thead>
+                        <tr>
+                          <th>ID</th>
+                          <th>Customer</th>
+                          <th>Total Money</th>
+                          <th>Status</th>
+                          <th>Order Date</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        @forelse($recentOrders as $order)
+                          <tr>
+                            <td>
+                              <a href="{{ route('admin.orders.show', $order->id) }}" class="text-primary fw-semibold">
+                                #{{ $order->id }}
+                              </a>
+                            </td>
+                            <td>{{ $order->customer->name ?? 'N/A' }}</td>
+                            <td>{{ number_format($order->total_money, 0, ',', '.') }} ₫</td>
+                            <td>
+                              @php
+                                $statusClass = match($order->status) {
+                                  'pending'   => 'badge bg-secondary',
+                                  'confirmed' => 'badge bg-info',
+                                  'shipping'  => 'badge bg-primary',
+                                  'completed' => 'badge bg-success',
+                                  'cancelled' => 'badge bg-danger',
+                                  default     => 'badge bg-light text-dark',
+                                };
+                              @endphp
+                              <span class="{{ $statusClass }}">{{ ucfirst($order->status) }}</span>
+                            </td>
+                            <td>{{ \Carbon\Carbon::parse($order->order_date)->format('d/m/Y') }}</td>
+                          </tr>
+                        @empty
+                          <tr>
+                            <td colspan="5" class="text-center text-muted py-3">Chưa có đơn hàng nào</td>
+                          </tr>
+                        @endforelse
+                      </tbody>
+                    </table>
                   </div>
 
-                  {{-- Canvas biểu đồ --}}
-                  <canvas id="order-chart" height="150"></canvas>
+                  {{-- Tổng cộng --}}
+                  <div class="text-end mt-3">
+                    <strong>Tổng doanh thu 5 đơn gần nhất:</strong>
+                    <span class="text-primary fw-bold">
+                      {{ number_format($recentOrdersTotal, 0, ',', '.') }} ₫
+                    </span>
+                  </div>
                 </div>
-
-                {{-- SCRIPT ORDER DETAILS --}}
-                @push('scripts')
-                <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-                <script>
-                document.addEventListener('DOMContentLoaded', function () {
-                  const months = {!! json_encode($months) !!};
-                  const totals = {!! json_encode($totals) !!};
-
-                  if (!months.length || !totals.length) return;
-
-                  const monthLabels = months.map(m => {
-                    const d = new Date();
-                    d.setMonth(m - 1);
-                    return d.toLocaleString('en', { month: 'short' });
-                  });
-
-                  const orderCanvas = document.getElementById('order-chart');
-                  if (orderCanvas) {
-                    new Chart(orderCanvas, {
-                      type: 'bar',
-                      data: {
-                        labels: monthLabels,
-                        datasets: [{
-                          label: 'Revenue (₫)',
-                          data: totals,
-                          backgroundColor: 'rgba(54, 162, 235, 0.6)',
-                          borderColor: 'rgba(54, 162, 235, 1)',
-                          borderWidth: 1,
-                          borderRadius: 5
-                        }]
-                      },
-                      options: {
-                        responsive: true,
-                        plugins: {
-                          legend: { display: false },
-                          title: {
-                            display: true,
-                            text: 'Monthly Revenue Overview',
-                            font: { size: 16, weight: 'bold' }
-                          },
-                          tooltip: {
-                            callbacks: {
-                              label: ctx => `Revenue: ${ctx.formattedValue} ₫`
-                            }
-                          }
-                        },
-                        scales: {
-                          x: { title: { display: true, text: 'Month' } },
-                          y: { beginAtZero: true, title: { display: true, text: 'Revenue (₫)' } }
-                        }
-                      }
-                    });
-                  }
-                });
-                </script>
-                @endpush
-
               </div>
             </div>
+
+            {{-- ===== CỘT PHẢI: SALES REPORT ===== --}}
             <div class="col-md-6 grid-margin stretch-card">
               <div class="card">
                 <div class="card-body">
                   <div class="d-flex justify-content-between align-items-center mb-2">
                     <p class="card-title">Sales Report</p>
-                    <a href="#" class="text-info small">View details</a>
                   </div>
-                  <p class="font-weight-500">Monthly revenue trend for {{ $year }} — visualized as a line chart.</p>
+
+                  <p class="font-weight-500">Biểu đồ doanh thu theo tháng trong {{ $year }}.</p>
 
                   <div class="text-center mb-3">
                     <h4 class="font-weight-bold text-success">
-                      Total: {{ number_format($totalYear, 0, ',', '.') }} ₫
+                      Tổng doanh thu: {{ number_format($totalYear, 0, ',', '.') }} ₫
                     </h4>
                   </div>
-
-                  <canvas id="sales-chart" height="150"></canvas>
-                </div>
-
-                {{-- SCRIPT SALES REPORT --}}
-                @push('scripts')
-                <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-                <script>
-                document.addEventListener('DOMContentLoaded', function () {
-                  const months = {!! json_encode($months) !!};
-                  const totals = {!! json_encode($totals) !!};
-
-                  if (!months.length || !totals.length) return;
-
-                  const monthLabels = months.map(m => {
-                    const d = new Date();
-                    d.setMonth(m - 1);
-                    return d.toLocaleString('en', { month: 'short' });
-                  });
-
-                  const salesCanvas = document.getElementById('sales-chart');
-                  if (salesCanvas) {
-                    new Chart(salesCanvas, {
-                      type: 'line',
-                      data: {
-                        labels: monthLabels,
-                        datasets: [{
-                          label: 'Sales (₫)',
-                          data: totals,
-                          fill: true,
-                          borderColor: 'rgba(75, 192, 192, 1)',
-                          backgroundColor: 'rgba(75, 192, 192, 0.2)',
-                          tension: 0.4,
-                          borderWidth: 2,
-                          pointBackgroundColor: '#fff',
-                          pointBorderColor: 'rgba(75, 192, 192, 1)',
-                          pointRadius: 5,
-                          pointHoverRadius: 7
-                        }]
-                      },
-                      options: {
-                        responsive: true,
-                        plugins: {
-                          legend: { display: true, position: 'top' },
-                          title: {
-                            display: true,
-                            text: 'Sales Trend — ' + {{ $year }},
-                            font: { size: 15, weight: 'bold' }
-                          },
-                          tooltip: {
-                            callbacks: {
-                              label: ctx => `Sales: ${ctx.formattedValue} ₫`
-                            }
-                          }
-                        },
-                        scales: {
-                          x: { title: { display: true, text: 'Month' } },
-                          y: { beginAtZero: true, title: { display: true, text: 'Sales (₫)' } }
-                        }
-                      }
-                    });
-                  }
-                });
-                </script>
-                @endpush
-
-              </div>
-            </div>
-          </div>
-          <div class="row">
-            <div class="col-md-12 grid-margin stretch-card">
-              <div class="card position-relative">
-                <div class="card-body">
-                  <div id="detailedReports" class="carousel slide detailed-report-carousel position-static pt-2" data-ride="carousel">
-                    <div class="carousel-inner">
-                      <div class="carousel-item active">
-                        <div class="row">
-                          <div class="col-md-12 col-xl-3 d-flex flex-column justify-content-start">
-                            <div class="ml-xl-4 mt-3">
-                            <p class="card-title">Detailed Reports</p>
-                              <h1 class="text-primary">$34040</h1>
-                              <h3 class="font-weight-500 mb-xl-4 text-primary">North America</h3>
-                              <p class="mb-2 mb-xl-0">The total number of sessions within the date range. It is the period time a user is actively engaged with your website, page or app, etc</p>
-                            </div>  
-                            </div>
-                          <div class="col-md-12 col-xl-9">
-                            <div class="row">
-                              <div class="col-md-6 border-right">
-                                <div class="table-responsive mb-3 mb-md-0 mt-3">
-                                  <table class="table table-borderless report-table">
-                                    <tr>
-                                      <td class="text-muted">Illinois</td>
-                                      <td class="w-100 px-0">
-                                        <div class="progress progress-md mx-4">
-                                          <div class="progress-bar bg-primary" role="progressbar" style="width: 70%" aria-valuenow="70" aria-valuemin="0" aria-valuemax="100"></div>
-                                        </div>
-                                      </td>
-                                      <td><h5 class="font-weight-bold mb-0">713</h5></td>
-                                    </tr>
-                                    <tr>
-                                      <td class="text-muted">Washington</td>
-                                      <td class="w-100 px-0">
-                                        <div class="progress progress-md mx-4">
-                                          <div class="progress-bar bg-warning" role="progressbar" style="width: 30%" aria-valuenow="30" aria-valuemin="0" aria-valuemax="100"></div>
-                                        </div>
-                                      </td>
-                                      <td><h5 class="font-weight-bold mb-0">583</h5></td>
-                                    </tr>
-                                    <tr>
-                                      <td class="text-muted">Mississippi</td>
-                                      <td class="w-100 px-0">
-                                        <div class="progress progress-md mx-4">
-                                          <div class="progress-bar bg-danger" role="progressbar" style="width: 95%" aria-valuenow="95" aria-valuemin="0" aria-valuemax="100"></div>
-                                        </div>
-                                      </td>
-                                      <td><h5 class="font-weight-bold mb-0">924</h5></td>
-                                    </tr>
-                                    <tr>
-                                      <td class="text-muted">California</td>
-                                      <td class="w-100 px-0">
-                                        <div class="progress progress-md mx-4">
-                                          <div class="progress-bar bg-info" role="progressbar" style="width: 60%" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100"></div>
-                                        </div>
-                                      </td>
-                                      <td><h5 class="font-weight-bold mb-0">664</h5></td>
-                                    </tr>
-                                    <tr>
-                                      <td class="text-muted">Maryland</td>
-                                      <td class="w-100 px-0">
-                                        <div class="progress progress-md mx-4">
-                                          <div class="progress-bar bg-primary" role="progressbar" style="width: 40%" aria-valuenow="40" aria-valuemin="0" aria-valuemax="100"></div>
-                                        </div>
-                                      </td>
-                                      <td><h5 class="font-weight-bold mb-0">560</h5></td>
-                                    </tr>
-                                    <tr>
-                                      <td class="text-muted">Alaska</td>
-                                      <td class="w-100 px-0">
-                                        <div class="progress progress-md mx-4">
-                                          <div class="progress-bar bg-danger" role="progressbar" style="width: 75%" aria-valuenow="75" aria-valuemin="0" aria-valuemax="100"></div>
-                                        </div>
-                                      </td>
-                                      <td><h5 class="font-weight-bold mb-0">793</h5></td>
-                                    </tr>
-                                  </table>
-                                </div>
-                              </div>
-                              <div class="col-md-6 mt-3">
-                                <canvas id="north-america-chart"></canvas>
-                                <div id="north-america-legend"></div>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                      <div class="carousel-item">
-                        <div class="row">
-                          <div class="col-md-12 col-xl-3 d-flex flex-column justify-content-start">
-                            <div class="ml-xl-4 mt-3">
-                            <p class="card-title">Detailed Reports</p>
-                              <h1 class="text-primary">$34040</h1>
-                              <h3 class="font-weight-500 mb-xl-4 text-primary">North America</h3>
-                              <p class="mb-2 mb-xl-0">The total number of sessions within the date range. It is the period time a user is actively engaged with your website, page or app, etc</p>
-                            </div>  
-                            </div>
-                          <div class="col-md-12 col-xl-9">
-                            <div class="row">
-                              <div class="col-md-6 border-right">
-                                <div class="table-responsive mb-3 mb-md-0 mt-3">
-                                  <table class="table table-borderless report-table">
-                                    <tr>
-                                      <td class="text-muted">Illinois</td>
-                                      <td class="w-100 px-0">
-                                        <div class="progress progress-md mx-4">
-                                          <div class="progress-bar bg-primary" role="progressbar" style="width: 70%" aria-valuenow="70" aria-valuemin="0" aria-valuemax="100"></div>
-                                        </div>
-                                      </td>
-                                      <td><h5 class="font-weight-bold mb-0">713</h5></td>
-                                    </tr>
-                                    <tr>
-                                      <td class="text-muted">Washington</td>
-                                      <td class="w-100 px-0">
-                                        <div class="progress progress-md mx-4">
-                                          <div class="progress-bar bg-warning" role="progressbar" style="width: 30%" aria-valuenow="30" aria-valuemin="0" aria-valuemax="100"></div>
-                                        </div>
-                                      </td>
-                                      <td><h5 class="font-weight-bold mb-0">583</h5></td>
-                                    </tr>
-                                    <tr>
-                                      <td class="text-muted">Mississippi</td>
-                                      <td class="w-100 px-0">
-                                        <div class="progress progress-md mx-4">
-                                          <div class="progress-bar bg-danger" role="progressbar" style="width: 95%" aria-valuenow="95" aria-valuemin="0" aria-valuemax="100"></div>
-                                        </div>
-                                      </td>
-                                      <td><h5 class="font-weight-bold mb-0">924</h5></td>
-                                    </tr>
-                                    <tr>
-                                      <td class="text-muted">California</td>
-                                      <td class="w-100 px-0">
-                                        <div class="progress progress-md mx-4">
-                                          <div class="progress-bar bg-info" role="progressbar" style="width: 60%" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100"></div>
-                                        </div>
-                                      </td>
-                                      <td><h5 class="font-weight-bold mb-0">664</h5></td>
-                                    </tr>
-                                    <tr>
-                                      <td class="text-muted">Maryland</td>
-                                      <td class="w-100 px-0">
-                                        <div class="progress progress-md mx-4">
-                                          <div class="progress-bar bg-primary" role="progressbar" style="width: 40%" aria-valuenow="40" aria-valuemin="0" aria-valuemax="100"></div>
-                                        </div>
-                                      </td>
-                                      <td><h5 class="font-weight-bold mb-0">560</h5></td>
-                                    </tr>
-                                    <tr>
-                                      <td class="text-muted">Alaska</td>
-                                      <td class="w-100 px-0">
-                                        <div class="progress progress-md mx-4">
-                                          <div class="progress-bar bg-danger" role="progressbar" style="width: 75%" aria-valuenow="75" aria-valuemin="0" aria-valuemax="100"></div>
-                                        </div>
-                                      </td>
-                                      <td><h5 class="font-weight-bold mb-0">793</h5></td>
-                                    </tr>
-                                  </table>
-                                </div>
-                              </div>
-                              <div class="col-md-6 mt-3">
-                                <canvas id="south-america-chart"></canvas>
-                                <div id="south-america-legend"></div>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                    <a class="carousel-control-prev" href="#detailedReports" role="button" data-slide="prev">
-                      <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                      <span class="sr-only">Previous</span>
-                    </a>
-                    <a class="carousel-control-next" href="#detailedReports" role="button" data-slide="next">
-                      <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                      <span class="sr-only">Next</span>
-                    </a>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div class="row">
-            <div class="col-md-7 grid-margin stretch-card">
-              <div class="card">
-                <div class="card-body">
-                  <p class="card-title mb-0">Top Products</p>
-                  <div class="table-responsive">
-                    <table class="table table-striped table-borderless">
-                      <thead>
+                  {{-- Bảng doanh thu theo tháng từ CSDL --}}
+                  <div class="table-responsive mt-3">
+                    <table class="table table-bordered table-striped">
+                      <thead class="table-light">
                         <tr>
-                          <th>Product</th>
-                          <th>Price</th>
-                          <th>Quantity</th>
-                          <th>Status</th>
+                          <th>Tháng</th>
+                          <th>Doanh thu (₫)</th>
                         </tr>
                       </thead>
                       <tbody>
-                        @foreach(App\Models\Product::latest()->take(5)->get() as $product)
-                        <tr>
-                          <td>{{ $product->name }}</td>
-                          <td>{{ number_format($product->price, 2) }} $</td>
-                          <td>{{ $product->quantity }}</td>
-                          <td><div class="badge badge-success">Available</div></td>
-                        </tr>
-                        @endforeach
+                        @forelse($revenues as $r)
+                          <tr>
+                            <td>Tháng {{ $r->month }}</td>
+                            <td>{{ number_format($r->total, 0, ',', '.') }} ₫</td>
+                          </tr>
+                        @empty
+                          <tr>
+                            <td colspan="2" class="text-center text-muted py-3">Chưa có doanh thu trong năm {{ $year }}</td>
+                          </tr>
+                        @endforelse
                       </tbody>
                     </table>
                   </div>
                 </div>
               </div>
             </div>
-            <div class="col-md-5 grid-margin stretch-card">
-							<div class="card">
-								<div class="card-body">
-									<h4 class="card-title">To Do Lists</h4>
-									<div class="list-wrapper pt-2">
-										<ul class="d-flex flex-column-reverse todo-list todo-list-custom">
-											<li>
-												<div class="form-check form-check-flat">
-													<label class="form-check-label">
-														<input class="checkbox" type="checkbox">
-														Meeting with Urban Team
-													</label>
-												</div>
-												<i class="remove ti-close"></i>
-											</li>
-											<li class="completed">
-												<div class="form-check form-check-flat">
-													<label class="form-check-label">
-														<input class="checkbox" type="checkbox" checked>
-														Duplicate a project for new customer
-													</label>
-												</div>
-												<i class="remove ti-close"></i>
-											</li>
-											<li>
-												<div class="form-check form-check-flat">
-													<label class="form-check-label">
-														<input class="checkbox" type="checkbox">
-														Project meeting with CEO
-													</label>
-												</div>
-												<i class="remove ti-close"></i>
-											</li>
-											<li class="completed">
-												<div class="form-check form-check-flat">
-													<label class="form-check-label">
-														<input class="checkbox" type="checkbox" checked>
-														Follow up of team zilla
-													</label>
-												</div>
-												<i class="remove ti-close"></i>
-											</li>
-											<li>
-												<div class="form-check form-check-flat">
-													<label class="form-check-label">
-														<input class="checkbox" type="checkbox">
-														Level up for Antony
-													</label>
-												</div>
-												<i class="remove ti-close"></i>
-											</li>
-										</ul>
-                  </div>
-                  <div class="add-items d-flex mb-0 mt-2">
-										<input type="text" class="form-control todo-list-input"  placeholder="Add new task">
-										<button class="add btn btn-icon text-primary todo-list-add-btn bg-transparent"><i class="icon-circle-plus"></i></button>
-									</div>
-								</div>
-							</div>
+          </div>
+
+          <div class="row">
+            <div class="col-md-12 grid-margin stretch-card">
+              <div class="card position-relative">
+              </div>
             </div>
           </div>
+          <div class="col-md-7 grid-margin stretch-card">
+            <div class="card">
+              <div class="card-body">
+                <p class="card-title mb-0">Top Products (Tháng {{ now()->month }})</p>
+                <p class="text-muted small mb-3">5 sản phẩm bán chạy nhất trong tháng hiện tại</p>
+                <div class="table-responsive">
+                  <table class="table table-striped table-borderless">
+                    <thead>
+                      <tr>
+                        <th>Sản phẩm</th>
+                        <th>Giá</th>
+                        <th>Đã bán</th>
+                        <th>Trạng thái</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      @forelse($topProducts as $product)
+                        <tr>
+                          <td>{{ $product->name }}</td>
+                          <td>{{ number_format($product->price, 0, ',', '.') }} đ</td>
+                          <td>{{ $product->total_sold }}</td>
+                          <td>
+                            <div class="badge {{ $product->total_sold > 0 ? 'badge-success' : 'badge-secondary' }}">
+                              {{ $product->total_sold > 0 ? 'Available' : 'Out of stock' }}
+                            </div>
+                          </td>
+                        </tr>
+                      @empty
+                        <tr>
+                          <td colspan="4" class="text-center text-muted">Chưa có dữ liệu bán hàng trong tháng này</td>
+                        </tr>
+                      @endforelse
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+
           <div class="row">
             <div class="col-md-4 stretch-card grid-margin">
               <div class="card">

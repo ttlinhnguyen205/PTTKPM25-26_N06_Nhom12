@@ -54,7 +54,7 @@
                       class="form-control currency-input"
                       inputmode="numeric"
                       placeholder="Nhập giá (VND)"
-                      value="{{ old('price', (int) $product->price) }}"
+                      value="{{ old('price', number_format($product->price, 0, ',', '.')) }}"
                       autocomplete="off">
                   </div>
                   <input type="hidden" id="price" name="price" value="{{ old('price', $product->price) }}">
