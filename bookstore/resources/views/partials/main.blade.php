@@ -8,21 +8,6 @@
                   <h6 class="font-weight-normal mb-0">All systems are running smoothly!</span></h6>
 
                 </div>
-                <div class="col-12 col-xl-4">
-                 <div class="justify-content-end d-flex">
-                  <div class="dropdown flex-md-grow-1 flex-xl-grow-0">
-                    <button class="btn btn-sm btn-light bg-white dropdown-toggle" type="button" id="dropdownMenuDate2" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
-                     <i class="mdi mdi-calendar"></i> Today (10 Jan 2025)
-                    </button>
-                    <div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenuDate2">
-                      <a class="dropdown-item" href="#">January - March</a>
-                      <a class="dropdown-item" href="#">March - June</a>
-                      <a class="dropdown-item" href="#">June - August</a>
-                      <a class="dropdown-item" href="#">August - November</a>
-                    </div>
-                  </div>
-                 </div>
-                </div>
               </div>
             </div>
           </div>
@@ -86,6 +71,35 @@
               </div>
             </div>
           </div>
+          <form method="GET" action="{{ route('admin.dashboard') }}" class="row g-2 align-items-end mb-3">
+            <div class="col-auto">
+              <label for="year" class="form-label mb-0">Năm</label>
+              <select name="year" id="year" class="form-select">
+                @for ($y = now()->year; $y >= now()->year - 5; $y--)
+                  <option value="{{ $y }}" {{ $y == $year ? 'selected' : '' }}>
+                    {{ $y }}
+                  </option>
+                @endfor
+              </select>
+            </div>
+
+            <div class="col-auto">
+              <label for="month" class="form-label mb-0">Tháng</label>
+              <select name="month" id="month" class="form-select">
+                <option value="">Tất cả</option>
+                @for ($m = 1; $m <= 12; $m++)
+                  <option value="{{ $m }}" {{ $m == $month ? 'selected' : '' }}>
+                    Tháng {{ $m }}
+                  </option>
+                @endfor
+              </select>
+            </div>
+
+            <div class="col-auto">
+              <button type="submit" class="btn btn-primary">Lọc</button>
+            </div>
+          </form>
+
           <div class="row">
             {{-- ===== CỘT TRÁI: ORDER DETAILS ===== --}}
             <div class="col-md-6 grid-margin stretch-card">
@@ -199,225 +213,91 @@
               </div>
             </div>
           </div>
-          <div class="col-md-7 grid-margin stretch-card">
-            <div class="card">
-              <div class="card-body">
-                <p class="card-title mb-0">Top Products (Tháng {{ now()->month }})</p>
-                <p class="text-muted small mb-3">5 sản phẩm bán chạy nhất trong tháng hiện tại</p>
-                <div class="table-responsive">
-                  <table class="table table-striped table-borderless">
-                    <thead>
-                      <tr>
-                        <th>Sản phẩm</th>
-                        <th>Giá</th>
-                        <th>Đã bán</th>
-                        <th>Trạng thái</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      @forelse($topProducts as $product)
-                        <tr>
-                          <td>{{ $product->name }}</td>
-                          <td>{{ number_format($product->price, 0, ',', '.') }} đ</td>
-                          <td>{{ $product->total_sold }}</td>
-                          <td>
-                            <div class="badge {{ $product->total_sold > 0 ? 'badge-success' : 'badge-secondary' }}">
-                              {{ $product->total_sold > 0 ? 'Available' : 'Out of stock' }}
-                            </div>
-                          </td>
-                        </tr>
-                      @empty
-                        <tr>
-                          <td colspan="4" class="text-center text-muted">Chưa có dữ liệu bán hàng trong tháng này</td>
-                        </tr>
-                      @endforelse
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-            </div>
-          </div>
-
           <div class="row">
-            <div class="col-md-4 stretch-card grid-margin">
+            {{-- ===== TOP PRODUCTS ===== --}}
+            <div class="col-md-7 grid-margin stretch-card">
               <div class="card">
                 <div class="card-body">
-                  <p class="card-title mb-0">Projects</p>
+                  <p class="card-title mb-0">Top Products</p>
+                  <p class="text-muted small mb-3">5 sản phẩm bán chạy nhất trong tháng hiện tại</p>
                   <div class="table-responsive">
-                    <table class="table table-borderless">
+                    <table class="table table-striped table-borderless align-middle">
                       <thead>
                         <tr>
-                          <th class="pl-0  pb-2 border-bottom">Places</th>
-                          <th class="border-bottom pb-2">Orders</th>
-                          <th class="border-bottom pb-2">Users</th>
+                          <th>Sản phẩm</th>
+                          <th>Giá</th>
+                          <th>Đã bán</th>
+                          <th>Trạng thái</th>
                         </tr>
                       </thead>
                       <tbody>
-                        <tr>
-                          <td class="pl-0">Kentucky</td>
-                          <td><p class="mb-0"><span class="font-weight-bold mr-2">65</span>(2.15%)</p></td>
-                          <td class="text-muted">65</td>
-                        </tr>
-                        <tr>
-                          <td class="pl-0">Ohio</td>
-                          <td><p class="mb-0"><span class="font-weight-bold mr-2">54</span>(3.25%)</p></td>
-                          <td class="text-muted">51</td>
-                        </tr>
-                        <tr>
-                          <td class="pl-0">Nevada</td>
-                          <td><p class="mb-0"><span class="font-weight-bold mr-2">22</span>(2.22%)</p></td>
-                          <td class="text-muted">32</td>
-                        </tr>
-                        <tr>
-                          <td class="pl-0">North Carolina</td>
-                          <td><p class="mb-0"><span class="font-weight-bold mr-2">46</span>(3.27%)</p></td>
-                          <td class="text-muted">15</td>
-                        </tr>
-                        <tr>
-                          <td class="pl-0">Montana</td>
-                          <td><p class="mb-0"><span class="font-weight-bold mr-2">17</span>(1.25%)</p></td>
-                          <td class="text-muted">25</td>
-                        </tr>
-                        <tr>
-                          <td class="pl-0">Nevada</td>
-                          <td><p class="mb-0"><span class="font-weight-bold mr-2">52</span>(3.11%)</p></td>
-                          <td class="text-muted">71</td>
-                        </tr>
-                        <tr>
-                          <td class="pl-0 pb-0">Louisiana</td>
-                          <td class="pb-0"><p class="mb-0"><span class="font-weight-bold mr-2">25</span>(1.32%)</p></td>
-                          <td class="pb-0">14</td>
-                        </tr>
+                        @forelse($topProducts as $product)
+                          <tr>
+                            <td>{{ $product->name }}</td>
+                            <td>{{ number_format($product->price, 0, ',', '.') }} đ</td>
+                            <td>{{ $product->total_sold }}</td>
+                            <td>
+                              <div class="badge {{ $product->total_sold > 0 ? 'badge-success' : 'badge-secondary' }}">
+                                {{ $product->total_sold > 0 ? 'Available' : 'Out of stock' }}
+                              </div>
+                            </td>
+                          </tr>
+                        @empty
+                          <tr>
+                            <td colspan="4" class="text-center text-muted py-3">
+                              Chưa có dữ liệu bán hàng trong tháng này
+                            </td>
+                          </tr>
+                        @endforelse
                       </tbody>
                     </table>
                   </div>
                 </div>
               </div>
             </div>
-            <div class="col-md-4 stretch-card grid-margin">
-              <div class="row">
-                <div class="col-md-12 grid-margin stretch-card">
-                  <div class="card">
-                    <div class="card-body">
-                      <p class="card-title">Charts</p>
-                      <div class="charts-data">
-                        <div class="mt-3">
-                          <p class="mb-0">Data 1</p>
-                          <div class="d-flex justify-content-between align-items-center">
-                            <div class="progress progress-md flex-grow-1 mr-4">
-                              <div class="progress-bar bg-inf0" role="progressbar" style="width: 95%" aria-valuenow="95" aria-valuemin="0" aria-valuemax="100"></div>
-                            </div>
-                            <p class="mb-0">5k</p>
-                          </div>
-                        </div>
-                        <div class="mt-3">
-                          <p class="mb-0">Data 2</p>
-                          <div class="d-flex justify-content-between align-items-center">
-                            <div class="progress progress-md flex-grow-1 mr-4">
-                              <div class="progress-bar bg-info" role="progressbar" style="width: 35%" aria-valuenow="35" aria-valuemin="0" aria-valuemax="100"></div>
-                            </div>
-                            <p class="mb-0">1k</p>
-                          </div>
-                        </div>
-                        <div class="mt-3">
-                          <p class="mb-0">Data 3</p>
-                          <div class="d-flex justify-content-between align-items-center">
-                            <div class="progress progress-md flex-grow-1 mr-4">
-                              <div class="progress-bar bg-info" role="progressbar" style="width: 48%" aria-valuenow="48" aria-valuemin="0" aria-valuemax="100"></div>
-                            </div>
-                            <p class="mb-0">992</p>
-                          </div>
-                        </div>
-                        <div class="mt-3">
-                          <p class="mb-0">Data 4</p>
-                          <div class="d-flex justify-content-between align-items-center">
-                            <div class="progress progress-md flex-grow-1 mr-4">
-                              <div class="progress-bar bg-info" role="progressbar" style="width: 25%" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100"></div>
-                            </div>
-                            <p class="mb-0">687</p>
-                          </div>
-                        </div>
-                      </div>  
-                    </div>
-                  </div>
-                </div>
-                <div class="col-md-12 stretch-card grid-margin grid-margin-md-0">
-                  <div class="card data-icon-card-primary">
-                    <div class="card-body">
-                      <p class="card-title text-white">Number of Meetings</p>                      
-                      <div class="row">
-                        <div class="col-8 text-white">
-                          <h3>34040</h3>
-                          <p class="text-white font-weight-500 mb-0">The total number of sessions within the date range.It is calculated as the sum . </p>
-                        </div>
-                        <div class="col-4 background-icon">
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div class="col-md-4 stretch-card grid-margin">
+
+            {{-- ===== LOW STOCK PRODUCTS ===== --}}
+            <div class="col-md-5 grid-margin stretch-card">
               <div class="card">
                 <div class="card-body">
-                  <p class="card-title">Notifications</p>
-                  <ul class="icon-data-list">
-                    <li>
-                      <div class="d-flex">
-                        <img src="{{asset('images/faces/face1.jpg')}}" alt="user">
-                        <div>
-                          <p class="text-info mb-1">Isabella Becker</p>
-                          <p class="mb-0">Sales dashboard have been created</p>
-                          <small>9:30 am</small>
-                        </div>
-                      </div>
-                    </li>
-                    <li>
-                      <div class="d-flex">
-                        <img src="{{asset('images/faces/face2.jpg')}}" alt="user">
-                        <div>
-                          <p class="text-info mb-1">Adam Warren</p>
-                          <p class="mb-0">You have done a great job #TW111</p>
-                          <small>10:30 am</small>
-                        </div>
-                      </div>
-                    </li>
-                    <li>
-                      <div class="d-flex">
-                      <img src="{{asset('images/faces/face3.jpg')}}" alt="user">
-                     <div>
-                      <p class="text-info mb-1">Leonard Thornton</p>
-                      <p class="mb-0">Sales dashboard have been created</p>
-                      <small>11:30 am</small>
-                     </div>
-                      </div>
-                    </li>
-                    <li>
-                      <div class="d-flex">
-                        <img src="{{asset('images/faces/face4.jpg')}}" alt="user">
-                        <div>
-                          <p class="text-info mb-1">George Morrison</p>
-                          <p class="mb-0">Sales dashboard have been created</p>
-                          <small>8:50 am</small>
-                        </div>
-                      </div>
-                    </li>
-                    <li>
-                      <div class="d-flex">
-                        <img src="{{asset('images/faces/face5.jpg')}}" alt="user">
-                        <div>
-                        <p class="text-info mb-1">Ryan Cortez</p>
-                        <p class="mb-0">Herbs are fun and easy to grow.</p>
-                        <small>9:00 am</small>
-                        </div>
-                      </div>
-                    </li>
-                  </ul>
+                  <p class="card-title mb-0">Sản phẩm sắp hết hàng</p>
+                  <p class="text-muted small mb-3">Danh sách 5 sản phẩm có số lượng tồn kho dưới 5</p>
+                  <div class="table-responsive">
+                    <table class="table table-striped table-borderless align-middle">
+                      <thead>
+                        <tr>
+                          <th>Tên sản phẩm</th>
+                          <th>Tồn kho</th>
+                          <th>Trạng thái</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        @forelse(App\Models\Product::where('quantity', '<', 5)->orderBy('quantity')->take(5)->get() as $item)
+                          <tr>
+                            <td>{{ $item->name }}</td>
+                            <td>{{ $item->quantity }}</td>
+                            <td>
+                              @if($item->quantity == 0)
+                                <div class="badge badge-danger">Hết hàng</div>
+                              @elseif($item->quantity < 5)
+                                <div class="badge badge-warning text-dark">Sắp hết</div>
+                              @else
+                                <div class="badge badge-success">Còn hàng</div>
+                              @endif
+                            </td>
+                          </tr>
+                        @empty
+                          <tr>
+                            <td colspan="3" class="text-center text-muted py-3">Tất cả sản phẩm đều đủ hàng</td>
+                          </tr>
+                        @endforelse
+                      </tbody>
+                    </table>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
-          <div class="row">
+
 
         </div>

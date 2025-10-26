@@ -1,9 +1,10 @@
 <?php
 
 namespace App\Http\Controllers\Admin;
-use Illuminate\Support\Facades\DB;
+
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 use App\Models\Product;
 use App\Models\Category;
@@ -12,52 +13,63 @@ use App\Models\User;
 
 class AdminController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        // ===== THỐNG KÊ CƠ BẢN =====
-        $totalProducts   = Product::count(); 
-        $totalCategories = Category::count(); 
-        $totalOrders     = Order::count(); 
-        $totalClients    = User::where('usertype', 'user')->count(); 
+        // ===== BỘ LỌC NĂM / THÁNG =====
+        $year  = $request->input('year', now()->year);
+        $month = $request->input('month'); // null = tất cả tháng
 
-        // ===== LẤY 5 ĐƠN HÀNG MỚI NHẤT =====
+        // ===== THỐNG KÊ CƠ BẢN =====
+        $totalProducts   = Product::count();
+        $totalCategories = Category::count();
+        $totalOrders     = Order::count();
+        $totalClients    = User::where('usertype', 'user')->count();
+
+        // ===== 5 ĐƠN HÀNG MỚI NHẤT =====
         $recentOrders = Order::with(['customer', 'address'])
             ->latest()
             ->take(5)
             ->get();
 
-        // Tổng tiền của 5 đơn hàng gần nhất
         $recentOrdersTotal = $recentOrders->sum('total_money');
 
-        // ===== DOANH THU THEO THÁNG =====
-        $year = now()->year;
-
-        $revenues = Order::selectRaw('MONTH(order_date) as month, SUM(total_money) as total')
+        // ===== DOANH THU THEO THÁNG / NĂM =====
+        $revenuesQuery = Order::selectRaw('MONTH(order_date) as month, SUM(total_money) as total')
             ->whereYear('order_date', $year)
-            ->where(function($q){
-                $q->where('status', 'completed')
-                  ->orWhere('status', 'paid')
-                  ->orWhere('status', 'done');
-            })
+            ->whereIn('status', ['completed', 'paid', 'done'])
             ->groupBy('month')
-            ->orderBy('month')
-            ->get();
+            ->orderBy('month');
+
+        if ($month) {
+            $revenuesQuery->whereMonth('order_date', $month);
+        }
+
+        $revenues = $revenuesQuery->get();
 
         // Dữ liệu cho biểu đồ và tổng kết
-        $months = $revenues->pluck('month');  // Mảng các tháng
-        $totals = $revenues->pluck('total');  // Mảng tổng tiền theo tháng
-        $totalYear = $revenues->sum('total'); // Tổng doanh thu cả năm
+        $months = $revenues->pluck('month');   // Mảng các tháng
+        $totals = $revenues->pluck('total');   // Mảng tổng tiền theo tháng
+        $totalYear = $revenues->sum('total');  // Tổng doanh thu cả năm
 
-        // ===== TOP 5 SẢN PHẨM BÁN CHẠY TRONG THÁNG HIỆN TẠI =====
-        $currentMonth = Carbon::now()->month;
-        $currentYear  = Carbon::now()->year;
-
-        $topProducts = Product::select('products.id', 'products.name', 'products.price', DB::raw('SUM(order_details.quantity) as total_sold'))
-            ->join('order_details', 'products.id', '=', 'order_details.product_id')
-            ->join('orders', 'orders.id', '=', 'order_details.order_id')
-            ->whereYear('orders.order_date', $currentYear)
-            ->whereMonth('orders.order_date', $currentMonth)
+        // ===== TOP 5 SẢN PHẨM BÁN CHẠY =====
+        $topProductsQuery = DB::table('order_details')
+            ->join('orders', 'order_details.order_id', '=', 'orders.id')
+            ->join('products', 'order_details.product_id', '=', 'products.id')
+            ->select(
+                'products.id',
+                'products.name',
+                'products.price',
+                DB::raw('SUM(order_details.quantity) as total_sold'),
+                DB::raw('SUM(order_details.price * order_details.quantity) as total_revenue')
+            )
             ->whereIn('orders.status', ['completed', 'paid', 'done'])
+            ->whereYear('orders.order_date', $year);
+
+        if ($month) {
+            $topProductsQuery->whereMonth('orders.order_date', $month);
+        }
+
+        $topProducts = $topProductsQuery
             ->groupBy('products.id', 'products.name', 'products.price')
             ->orderByDesc('total_sold')
             ->take(5)
@@ -65,9 +77,9 @@ class AdminController extends Controller
 
         // ===== TRẢ DỮ LIỆU RA VIEW =====
         return view('admin.dashboard', compact(
-            'totalProducts', 
-            'totalCategories', 
-            'totalOrders', 
+            'totalProducts',
+            'totalCategories',
+            'totalOrders',
             'totalClients',
             'recentOrders',
             'recentOrdersTotal',
@@ -76,6 +88,7 @@ class AdminController extends Controller
             'totals',
             'totalYear',
             'year',
+            'month',
             'topProducts'
         ));
     }
