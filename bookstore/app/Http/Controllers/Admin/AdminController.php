@@ -17,7 +17,7 @@ class AdminController extends Controller
     {
         // ===== BỘ LỌC NĂM / THÁNG =====
         $year  = $request->input('year', now()->year);
-        $month = $request->input('month'); // null = tất cả tháng
+        $month = $request->input('month');
 
         // ===== THỐNG KÊ CƠ BẢN =====
         $totalProducts   = Product::count();
@@ -47,9 +47,9 @@ class AdminController extends Controller
         $revenues = $revenuesQuery->get();
 
         // Dữ liệu cho biểu đồ và tổng kết
-        $months = $revenues->pluck('month');   // Mảng các tháng
-        $totals = $revenues->pluck('total');   // Mảng tổng tiền theo tháng
-        $totalYear = $revenues->sum('total');  // Tổng doanh thu cả năm
+        $months = $revenues->pluck('month');   
+        $totals = $revenues->pluck('total');   
+        $totalYear = $revenues->sum('total'); 
 
         // ===== TOP 5 SẢN PHẨM BÁN CHẠY =====
         $topProductsQuery = DB::table('order_details')

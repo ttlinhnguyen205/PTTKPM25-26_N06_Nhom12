@@ -169,7 +169,7 @@
               <div class="card">
                 <div class="card-body">
                   <div class="d-flex justify-content-between align-items-center mb-2">
-                    <p class="card-title">Sales Report</p>
+                    <p class="card-title">Báo cáo doanh thu</p>
                   </div>
 
                   <p class="font-weight-500">Biểu đồ doanh thu theo tháng trong {{ $year }}.</p>
@@ -218,7 +218,7 @@
             <div class="col-md-7 grid-margin stretch-card">
               <div class="card">
                 <div class="card-body">
-                  <p class="card-title mb-0">Top Products</p>
+                  <p class="card-title mb-0">Top sản phẩm</p>
                   <p class="text-muted small mb-3">5 sản phẩm bán chạy nhất trong tháng hiện tại</p>
                   <div class="table-responsive">
                     <table class="table table-striped table-borderless align-middle">
