@@ -35,4 +35,5 @@ Nhóm người dùng	Chức năng
 - Quản lý người dùng
 - Quản lý đơn hàng
 - Cập nhật thông tin admin
+- Xen báo cáo doanh thu, các sản phẩm sắp hết hàng.
 - Đăng xuất
