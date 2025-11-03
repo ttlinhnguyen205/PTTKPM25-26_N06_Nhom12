@@ -11,13 +11,11 @@
         </div>
     </div>
 
-    <!-- Search box -->
     <form method="GET" action="{{ route('admin.users.index') }}" class="mb-3">
         <input type="text" name="q" value="{{ request('q') }}" 
                class="form-control" placeholder="Search by ID, name or email">
     </form>
 
-    <!-- Table -->
     <div class="table-responsive">
         <table class="table align-middle table-hover">
             <thead>
@@ -33,10 +31,8 @@
             <tbody>
                 @forelse($users as $user)
                 <tr>
-                    <!-- Checkbox -->
                     <td><input type="checkbox" name="ids[]" value="{{ $user->id }}"></td>
 
-                    <!-- User -->
                     <td class="d-flex align-items-center">
                         @if($user->avatar ?? false)
                             <img src="{{ asset($user->avatar) }}" 
@@ -55,19 +51,12 @@
                         </div>
                     </td>
 
-                    <!-- Contact -->
                     <td>
                         <div>{{ $user->email }}</div>
                         <small class="text-muted">{{ $user->phone ?? '—' }}</small>
                     </td>
-
-                    <!-- Role -->
                     <td>{{ ucfirst($user->usertype) }}</td>
-
-                    <!-- Orders -->
                     <td>{{ $user->orders_count ?? 0 }}</td>
-
-                    <!-- Actions -->
                     <td class="text-end">
                         <a href="{{ route('admin.users.show', $user->id) }}" class="text-primary me-2" title="View">
                             <i class="fa-solid fa-eye"></i>
@@ -93,7 +82,6 @@
         </table>
     </div>
 
-    <!-- Pagination -->
     <div class="d-flex justify-content-between align-items-center mt-3">
         <div>
             Showing {{ $users->firstItem() }} - {{ $users->lastItem() }} of {{ $users->total() }}
@@ -104,10 +92,9 @@
     </div>
 </div>
 
-<!-- Font Awesome -->
+
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
-<!-- Script: check all checkboxes -->
 <script>
 document.getElementById('checkAll').addEventListener('change', function() {
     let checkboxes = document.querySelectorAll('input[name="ids[]"]');

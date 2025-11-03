@@ -4,12 +4,10 @@
 
 @section('content')
 <div class="container">
-    {{-- Hiển thị thông báo --}}
     @if(session('success'))
         <div class="alert alert-success">{{ session('success') }}</div>
     @endif
 
-    {{-- Bảng danh mục --}}
     <div class="container">
         <h2 class="card-title">Danh sách danh mục</h2>
         <div class="card">

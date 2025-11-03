@@ -8,7 +8,6 @@
 
     <div class="card">
         <div class="card-body">
-            <!-- Hiển thị thông báo lỗi -->
             @if ($errors->any())
                 <div class="alert alert-danger">
                     <ul class="mb-0">
@@ -18,8 +17,6 @@
                     </ul>
                 </div>
             @endif
-
-            <!-- Form tạo người dùng -->
             <form action="{{ route('admin.users.store') }}" method="POST">
                 @csrf
 
@@ -43,7 +40,6 @@
                     <input type="password" name="password_confirmation" class="form-control" required>
                 </div>
 
-                <!-- Thêm trường chọn Vai trò -->
                 <div class="mb-3">
                     <label class="form-label">Vai trò</label>
                     <select name="usertype" class="form-control" required>

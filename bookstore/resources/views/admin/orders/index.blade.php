@@ -33,14 +33,12 @@
 @endpush
 
 <div class="container-fluid px-3 px-md-4">
-  {{-- ==== THÔNG BÁO ==== --}}
   @if(session('success'))
     <div class="alert alert-success">{{ session('success') }}</div>
   @endif
 
   <div class="card-ui p-3 p-md-4">
 
-    {{-- ==== THANH CÔNG CỤ ==== --}}
     <div class="d-flex flex-wrap gap-2 justify-content-between align-items-center mb-3">
       <form method="GET" action="{{ route('admin.orders.index') }}" class="flex-grow-1 me-2" style="max-width:520px;">
         <div class="position-relative">
@@ -60,7 +58,6 @@
       </div>
     </div>
 
-    {{-- ==== TAB TRẠNG THÁI ==== --}}
     <div class="tabs-wrap mb-3">
       <div class="d-flex flex-wrap gap-2">
         <a href="{{ route('admin.orders.index', array_filter(['q'=>$q])) }}"
@@ -82,7 +79,6 @@
       </div>
     </div>
 
-    {{-- ==== BẢNG ĐƠN HÀNG ==== --}}
     <div class="table-responsive">
       <table class="table align-middle table-hover table-rounded">
         <thead>
@@ -116,7 +112,6 @@
             <tr>
               <td><input type="checkbox" name="ids[]" value="{{ $order->id }}"></td>
 
-              {{-- Cột thông tin đơn hàng --}}
               <td>
                 <div class="d-flex align-items-center">
                   @if($thumb)
@@ -131,10 +126,7 @@
                 </div>
               </td>
 
-              {{-- Tên khách hàng --}}
               <td>{{ $order->customer->name ?? 'N/A' }}</td>
-
-              {{-- Danh sách sản phẩm trong đơn --}}
               <td>
                   @if($order->orderDetails->isEmpty())
                       <span class="text-muted">Không có sản phẩm</span>
@@ -151,19 +143,10 @@
                   @endif
               </td>
 
-              {{-- Tổng tiền --}}
               <td>{{ number_format($order->total_money ?? 0, 0, ',', '.') }} đ</td>
-
-              {{-- Ngày đặt --}}
               <td>{{ \Carbon\Carbon::parse($order->order_date)->format('d/m/Y') }}</td>
-
-              {{-- Thanh toán --}}
               <td><span class="{{ $paymentClass }}">{{ Str::title($payment) }}</span></td>
-
-              {{-- Trạng thái --}}
               <td><span class="{{ $statusClass }}">{{ Str::title($order->status) }}</span></td>
-
-              {{-- Hành động --}}
               <td class="text-end">
                 <a href="{{ route('admin.orders.show', $order->id) }}" class="icon-btn me-1" title="Xem">
                   <i class="fa-regular fa-eye"></i>
@@ -189,7 +172,6 @@
       </table>
     </div>
 
-    {{-- ==== FOOTER PHÂN TRANG ==== --}}
     <div class="d-flex justify-content-between align-items-center mt-2">
       <div class="text-muted small">
         {{ $orders->firstItem() ?? 0 }} - {{ $orders->lastItem() ?? 0 }} / {{ $orders->total() ?? $orders->count() }} đơn hàng

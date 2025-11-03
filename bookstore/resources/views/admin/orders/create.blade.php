@@ -6,7 +6,6 @@
 <div class="container">
     <h2>Đặt hàng mới</h2>
 
-    {{-- Hiển thị lỗi validate --}}
     @if ($errors->any())
         <div class="alert alert-danger">
             <ul class="mb-0">
@@ -17,7 +16,6 @@
         </div>
     @endif
 
-    {{-- Form tạo đơn hàng --}}
     <form action="{{ route('admin.orders.store') }}" method="POST">
         @csrf
         <div class="mb-3">

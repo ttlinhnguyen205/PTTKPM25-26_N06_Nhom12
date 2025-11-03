@@ -22,10 +22,7 @@
 <div class="products-index">
   <div class="card shadow-sm p-3">
 
-    {{-- ======= THANH CÔNG CỤ ======= --}}
     <div class="d-flex flex-wrap gap-2 justify-content-between align-items-center mb-3">
-
-      {{-- Ô tìm kiếm --}}
       <form method="GET" action="{{ route('admin.products.index') }}" id="filterForm"
             class="flex-grow-1 me-2" style="max-width:520px;">
         <div class="position-relative">
@@ -38,7 +35,6 @@
         </div>
       </form>
 
-      {{-- Bộ lọc sắp xếp --}}
       <form method="GET" action="{{ route('admin.products.index') }}" id="sortForm"
             class="d-flex align-items-center gap-2">
         <select name="sort" class="form-select" id="sortSelect" onchange="this.form.submit()">
@@ -55,7 +51,6 @@
       </form>
     </div>
 
-    {{-- ======= BẢNG SẢN PHẨM ======= --}}
     <div class="table-responsive">
       <table class="table align-middle table-hover">
         <thead>
@@ -116,7 +111,6 @@
       </table>
     </div>
 
-    {{-- ======= PHÂN TRANG ======= --}}
     <div class="d-flex justify-content-between align-items-center mt-3">
       <div>
         Showing {{ $products->firstItem() }} - {{ $products->lastItem() }} of {{ $products->total() }}

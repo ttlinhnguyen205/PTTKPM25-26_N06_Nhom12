@@ -6,7 +6,6 @@
 <div class="container">
     <h2 class="mb-4">Sửa User</h2>
 
-    <!-- Hiển thị lỗi nếu có -->
     @if ($errors->any())
         <div class="alert alert-danger">
             <ul class="mb-0">
@@ -17,7 +16,6 @@
         </div>
     @endif
 
-    <!-- Form sửa user -->
     <form action="{{ route('admin.users.update', $user->id) }}" method="POST">
         @csrf
         @method('PUT')
@@ -42,7 +40,6 @@
             <input type="password" name="password_confirmation" class="form-control">
         </div>
 
-        <!-- Trường vai trò -->
         <div class="mb-3">
             <label class="form-label">Vai trò</label>
             <select name="usertype" class="form-control" required>
